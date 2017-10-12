@@ -63,4 +63,6 @@ chkgate http://localhost:9000 Demo
 ```
 ### 注意事项
 
-不同版本sonar可能api有所区别,需要做调整.本脚本基于sonarqube6.4版本.
+- 1.不同版本sonar可能api有所区别,需要做调整.本脚本基于sonarqube6.4版本.
+
+- 2.需要用到jq工具解析json串.需要安装.

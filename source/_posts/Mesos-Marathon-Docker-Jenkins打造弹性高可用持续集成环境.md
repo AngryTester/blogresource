@@ -20,9 +20,11 @@ tags: [Jenkins,Mesos,Marathon,Docker,Jenkins]
 
 - 1.Mesos
 
+Mesos是Apache下的开源分布式资源管理框架，它被称为是分布式系统的内核。以下是官网给出的架构图。Mesos包括master和agent，其中master负责调度，agent负责执行。agent上任务的执行实际是通过executor来完成的，并且任务不会直接执行在agent的操作系统上，而是运行在一个相对隔离的沙箱环境，这样一方面是保证了安全性，另外一方面也确保了在同一个agent上可能运行多个任务而不会互相影响。这一点相对Jenkins目前的分发策略完全是个颠覆，有了这个机制，一台分发服务器就可以当做多个构建节点来使用了。
+
 ![](https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesos.png)
 
-Mesos是Apache下的开源分布式资源管理框架，它被称为是分布式系统的内核。以上是官网（http://mesos.apache.org/）给出的架构图。Mesos包括master和agent，其中master负责调度，agent负责执行。agent上任务的执行实际是通过executor来完成的，并且任务不会直接执行在agent的操作系统上，而是运行在一个相对隔离的沙箱环境，这样一方面是保证了安全性，另外一方面也确保了在同一个agent上可能运行多个任务而不会互相影响。这一点相对Jenkins目前的分发策略完全是个颠覆，有了这个机制，一台分发服务器就可以当做多个构建节点来使用了。
+
 
 -2.Marathon
 

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Jenkins,Mesos,Marathon,Docker," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="AngryTester" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,可预见的是构建任务会越来越多,对持续集成环境的要求也越来越高.目前持续集成环境采取的方案是单master节点+多slave节点的传统方式,随着任务量越来越大,暴露出几个明显的问题:  1.构建节点数不够：带来的直接影响是如果多任务并发，将会有大量任务由于没">
+<meta name="keywords" content="Jenkins,Mesos,Marathon,Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mesos+Marathon+Docker+Jenkins打造弹性高可用持续集成环境">
+<meta property="og:url" content="http://yoursite.com/2017/10/11/Mesos-Marathon-Docker-Jenkins打造弹性高可用持续集成环境/index.html">
+<meta property="og:site_name" content="AngryTester">
+<meta property="og:description" content="前言去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,可预见的是构建任务会越来越多,对持续集成环境的要求也越来越高.目前持续集成环境采取的方案是单master节点+多slave节点的传统方式,随着任务量越来越大,暴露出几个明显的问题:  1.构建节点数不够：带来的直接影响是如果多任务并发，将会有大量任务由于没">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesos.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathon.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosui.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/frame.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/agent.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resource.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathonui.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/volumn.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/running.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkins.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/runningjenkins.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinslog.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosplugin.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/addcloud.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinsframe.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/reourcenew.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulnode.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulslave.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resourcenewest.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/slaveresource.png">
+<meta property="og:updated_time" content="2017-10-12T01:08:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mesos+Marathon+Docker+Jenkins打造弹性高可用持续集成环境">
+<meta name="twitter:description" content="前言去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,可预见的是构建任务会越来越多,对持续集成环境的要求也越来越高.目前持续集成环境采取的方案是单master节点+多slave节点的传统方式,随着任务量越来越大,暴露出几个明显的问题:  1.构建节点数不够：带来的直接影响是如果多任务并发，将会有大量任务由于没">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesos.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/11/Mesos-Marathon-Docker-Jenkins打造弹性高可用持续集成环境/"/>
+
+
+
+
+
+  <title>Mesos+Marathon+Docker+Jenkins打造弹性高可用持续集成环境 | AngryTester</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">AngryTester</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">起点不论好坏，终点始终美好！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/11/Mesos-Marathon-Docker-Jenkins打造弹性高可用持续集成环境/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="AngryTester">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="AngryTester">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mesos+Marathon+Docker+Jenkins打造弹性高可用持续集成环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-11T11:50:15+08:00">
+                2017-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,可预见的是构建任务会越来越多,对持续集成环境的要求也越来越高.目前持续集成环境采取的方案是单master节点+多slave节点的传统方式,随着任务量越来越大,暴露出几个明显的问题:</p>
+<ul>
+<li>1.构建节点数不够：带来的直接影响是如果多任务并发，将会有大量任务由于没有可用构建节点而需要长时间的等待。这对于持续交付要求的快速反馈是非常不利的。</li>
+<li>2.分发服务器资源利用率不均：这一点与Jenkins自身的分发机制有关，单任务只能指定构建节点，即必须指定服务器。带来的影响是如果构建策略命中的任务只集中在一台服务器构建，那么可能指定的这台服务器基本满载，而另外的分发服务器可能是空闲的。</li>
+<li>3.环境可用性差：目前环境的维护是纯靠手工的，特别是在服务器出现问题之后，需要人工及时重启，如果维护人员没有及时知晓，可能环境长时间不可用，这对于生产工作也是极为不利的。</li>
+</ul>
+<p>基于以上存在的问题，我们引入了Mesos+Marathon+Docker+Jenkins的技术方案来搭建一个弹性高可用的持续集成环境。</p>
+<h2 id="方案介绍"><a href="#方案介绍" class="headerlink" title="方案介绍"></a>方案介绍</h2><p>首先，我们先来了解一下这个方案中涉及到的新工具。</p>
+<ul>
+<li>1.Mesos</li>
+</ul>
+<p>Mesos是Apache下的开源分布式资源管理框架，它被称为是分布式系统的内核。以下是官网给出的架构图。Mesos包括master和agent，其中master负责调度，agent负责执行。agent上任务的执行实际是通过executor来完成的，并且任务不会直接执行在agent的操作系统上，而是运行在一个相对隔离的沙箱环境，这样一方面是保证了安全性，另外一方面也确保了在同一个agent上可能运行多个任务而不会互相影响。这一点相对Jenkins目前的分发策略完全是个颠覆，有了这个机制，一台分发服务器就可以当做多个构建节点来使用了。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesos.png" alt=""></p>
+<p>-2.Marathon</p>
+<p>马拉松重点解决的问题是服务不可用时的处理。从上面Mesos的架构图也可以看出，Mesos本身是不具备调度任务的功能的，必须得借助Framework来完全，例如上图中的Hadoop和MPI就是属于这类框架。Marathon也是属于调度任务的框架，并且有一个很好的特点，在节点任务执行时候时，可以结合Mesos自动选择其他节点重新执行任务，这样就保证了任务的长时间运行，这对于Jenkins所要求的长时可用非常重要。以下是官网给出的Marathon和Mesos结合使用的架构图。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathon.png" alt=""></p>
+<ul>
+<li>3.Docker</li>
+</ul>
+<p>Docker容器的隔离性、一致性用于快速Jenkins构建环境将会是绝配。这个方案中，我们将使用到两个镜像，一个镜像是Jenkins服务，另一个是Jenkins的构建节点，通过Docker镜像可以很方便的复制出多个一致的构建环境，并且各个环境运行在一台实体服务器上而不会互相影响。</p>
+<ul>
+<li>4.Jenkins</li>
+</ul>
+<p>公司去年的持续集成环境主要就是基于Jenkins(虽然现在已转移到gitlab-ci)。在这个方案中，我们将用到Jenkins的mesos插件，这个插件实际上实现了一个framework，通过这个framework结合Mesos可以帮助我们在单台实体服务器上申请多个构建环境运行构建任务，且各个构建环境之间不会互相影响，后续会详细介绍这个插件的配置。 </p>
+<p>以上介绍完了这个方案中涉及到的工具，下面的具体的实现方案。</p>
+<h3 id="第一步，准备三台机器"><a href="#第一步，准备三台机器" class="headerlink" title="第一步，准备三台机器."></a>第一步，准备三台机器.</h3><p>考虑到要使用docker，我这里的准备的是三台CentOS7。</p>
+<p>机器1：我们会在这台机器上运行Mesos Master，Marathon和Zookeeper。<br>机器2、机器3：这两台机器作为Mesos Slave，运行Jenkins环境以及分发的构建环<br>境。</p>
+<p>先配置三台机器的hosts： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">172.26.1.1 master</div><div class="line">172.26.1.2 slave1</div><div class="line">172.26.1.3 slave2</div></pre></td></tr></table></figure>
+<p>以上IP为虚拟，做演示用，实际配置请根据你的机器的实际IP。</p>
+<h3 id="第二步，安装相关工具并对服务器做相关配置。"><a href="#第二步，安装相关工具并对服务器做相关配置。" class="headerlink" title="第二步，安装相关工具并对服务器做相关配置。"></a>第二步，安装相关工具并对服务器做相关配置。</h3><p>根据上面的安排，我们将在机器1上安装Mesos、Marathon、Zookeeper。</p>
+<ul>
+<li>1.安装mesos源。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#配置Mesos源</div><div class="line">rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm</div></pre></td></tr></table></figure>
+<ul>
+<li>2.安装工具。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install mesos marathon mesosphere-zookeeper</div></pre></td></tr></table></figure>
+<ul>
+<li>3.配置Zookeeper。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">cd /etc/zookeeper/conf</div><div class="line">grep -v &quot;#&quot; zoo_sample.cfg &gt;zoo.cfg</div><div class="line">vi zoo.cfg</div><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/var/lib/zookeeper</div><div class="line">clientPort=2181</div><div class="line">server.1=172.26.1.1:2888:3888</div><div class="line">echo 1&gt;myid</div><div class="line">vi /etc/mesos/zk</div><div class="line">zk://172.26.1.1:2181/mesos</div></pre></td></tr></table></figure>
+<ul>
+<li>4.配置Marathon。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">cd /etc/marathon/conf</div><div class="line">vi hostname</div><div class="line">172.26.1.1</div><div class="line">vi master</div><div class="line">zk://172.26.1.1:2181/mesos</div><div class="line">vi zk</div><div class="line">zk://172.26.1.1:2181/marathon</div></pre></td></tr></table></figure>
+<ul>
+<li>5.配置Mesos Master。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">cd /etc/mesos-master</div><div class="line">vi cluster</div><div class="line">#输入任意你定义的集群的名称，如：vms</div><div class="line">vi hostname</div><div class="line">#输入master的服务器IP，如：172.26.1.1</div><div class="line">vi ip</div><div class="line">#输入master的ip，如：172.26.1.1</div></pre></td></tr></table></figure>
+<ul>
+<li>6.启动Master上的相关服务。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">systemctl start zookeeper</div><div class="line">systemctl start mesos-master</div><div class="line">systemctl start marathon</div></pre></td></tr></table></figure>
+<p>访问<a href="http://172.26.1.1:5050就能看到Mesos" target="_blank" rel="external">http://172.26.1.1:5050就能看到Mesos</a> UI界面，如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosui.png" alt=""></p>
+<p>点击<code>Frameworks</code>标签页，可看到已注册了一个framework，即我们在master上启动的marathon。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/frame.png" alt=""></p>
+<p>以上master的配置完成。</p>
+<p>下面对两个slave进行配置，根据上面的安排，我们需要在两个slave上安装docker和mesos。</p>
+<ul>
+<li>1.安装mesos源和docker源。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#配置Mesos源</div><div class="line">rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm</div></pre></td></tr></table></figure>
+<ul>
+<li>2.安装docker和mesos。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install docker mesos</div></pre></td></tr></table></figure>
+<ul>
+<li>3.配置mesos-slave。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">#设置slave支持docker容器。</div><div class="line">cd /etc/mesos-slave</div><div class="line">vi containerizers</div><div class="line">docker,mesos</div><div class="line">#设置执行器注册超时时间。</div><div class="line">vi executor_registration_timeout</div><div class="line">5mins</div><div class="line">vi hostname</div><div class="line">172.26.1.2（或172.26.1.3）</div><div class="line">vi ip</div><div class="line">172.26.1.2（或172.26.1.3）</div><div class="line">#设置zookeeper地址。</div><div class="line">vi /etc/mesos/zk</div><div class="line">zk://172.26.1.1:2181/mesos</div></pre></td></tr></table></figure>
+<ul>
+<li>4.启动。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">systemctl start mesos-slave</div><div class="line">systemctl start docker</div></pre></td></tr></table></figure>
+<p>启动完之后，再进入Mesos UI界面刷新查看，再点击<code>Agents</code>标签页，可以看到两个slave机器都已经连接上了。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/agent.png" alt=""></p>
+<p>从首页可以看到目前可用的资源总量。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resource.png" alt=""></p>
+<p>至此，服务器的配置结束。</p>
+<h3 id="第三步，通过marathon来发布一个jenkins应用。"><a href="#第三步，通过marathon来发布一个jenkins应用。" class="headerlink" title="第三步，通过marathon来发布一个jenkins应用。"></a>第三步，通过marathon来发布一个jenkins应用。</h3><p>首先，我们需要做一个jenkins镜像，可参考如下<code>Dockfile</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">#基础镜像是centos7</div><div class="line">FROM hub.com/centos:7.dumb-init</div><div class="line"> </div><div class="line">#镜像所有者</div><div class="line">MAINTAINER angrytester &quot;thx_phila@yahoo.com&quot;</div><div class="line"> </div><div class="line">#指定用户</div><div class="line">USER root</div><div class="line"> </div><div class="line">#新建相关目录</div><div class="line">RUN mkdir -p /jenkins/jdk1.7.0_75</div><div class="line"> </div><div class="line">#安装mesos marathon</div><div class="line">RUN rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm\</div><div class="line">&amp;&amp; yum install -y mesos</div><div class="line"> </div><div class="line">COPY jdk1.7.0_75 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">COPY jenkins.war /jenkins/</div><div class="line"> </div><div class="line">#添加启动脚本至根目录</div><div class="line">COPY start.sh /</div><div class="line"> </div><div class="line">#添加相关权限</div><div class="line">RUN chmod -R 777 /jenkins/jdk1.7.0_75/\</div><div class="line">&amp;&amp; chmod -R 777 /jenkins/jenkins.war</div><div class="line"> </div><div class="line">#设置JENKINS_HOME环境变量，jenkins启动时自动从JENKINS_HOME下读取配置文件</div><div class="line">ENV JENKINS_HOME /jenkins/jenkins_home</div><div class="line"> </div><div class="line">#设置JAVA_HOME MAVEN_HOME ANT_HOME PATH环境变量</div><div class="line">ENV JAVA_HOME /jenkins/jdk1.7.0_75</div><div class="line">ENV PATH $PATH:$JAVA_HOME/bin</div><div class="line"> </div><div class="line">#暴露8080端口</div><div class="line">EXPOSE 8080</div><div class="line"> </div><div class="line">#容器启动时运行脚本</div><div class="line">CMD [&quot;/bin/sh&quot;,&quot;/start.sh&quot;]</div></pre></td></tr></table></figure>
+<p><code>start.sh</code>的内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#!/bin/sh</div><div class="line"> </div><div class="line">#jenkins启动命令</div><div class="line">/jenkins/jdk1.7.0_75/bin/java -jar /jenkins/jenkins.war</div></pre></td></tr></table></figure>
+<p>说明：镜像里面安装了mesos，主要是为后面在jenkins中使用mesos插件准备，因为mesos插件需要用到mesos的库文件。</p>
+<p>访问172.26.1.1:8080可以看到marathon的UI界面，点击<code>Create Application</code>按钮，<code>ID</code>输入：Jenkins，<code>CPU</code>输入：0.2，<code>Memory</code>输入256，其他默认。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathonui.png" alt=""></p>
+<p>点击<code>Docker Container</code>，<code>Image</code>输入上一步中我们打好的镜像，<code>Network</code>选择Host，其他默认。</p>
+<p> 点击<code>Volumes</code>设置容器存储挂载，如下图：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/volumn.png" alt=""></p>
+<p> 因为镜像中jenkins的主目录设置为/jenkins/jenkins_home，所以将容器里的对应目录挂载到本地服务器的/jenkins目录下，这样容器里jenkins产生的所有数据都会在本地服务器的/jenkins目录下了。</p>
+<p>最后点击Create Application按钮，等几分钟，就可以看到任务状态变成了运行中。（需要注意，上面打的镜像我们需要提前docker pull到服务器上，因为marathon会直接docker run镜像，而不会做pull操作）</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/running.png" alt=""></p>
+<p>点击任务查看任务详情，可以看到任务是在哪一台服务器上运行。</p>
+<p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkins.png" alt=""></p>
+<p> 输入对应服务器IP:8080，就可以访问到对应的jenkins了。</p>
+<p>在Mesos UI首页，也可以看到正在运行的jenkins任务。</p>
+<p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/runningjenkins.png" alt=""></p>
+<p>点击Sandbox，从下图中两个链接就可以看到jenkins的输出日志（jenkins第一次启动所需的密码可以从这里获得）:</p>
+<p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinslog.png" alt=""></p>
+<h3 id="第四步，我们需要对上一步启动的jenkins做一些配置。"><a href="#第四步，我们需要对上一步启动的jenkins做一些配置。" class="headerlink" title="第四步，我们需要对上一步启动的jenkins做一些配置。"></a>第四步，我们需要对上一步启动的jenkins做一些配置。</h3><p>安装mesos插件。</p>
+<p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosplugin.png" alt=""></p>
+<p>插件安装完成之后，进入系统管理→系统设置，会看到多了下面这一项：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/addcloud.png" alt=""></p>
+<p> 新增一个云：</p>
+<p> Mesos native library path：/usr/lib/libmesos.so<br>Mesos Master [hostname:port]：172.26.1.1:5050<br>On-demand framework registration：no<br>Jenkins Slave CPUs：0.2<br>Jenkins Slave Memory in MB：30<br>Minimum number of Executors per Slave：1<br>Maximum number of Executors per Slave：1<br>Jenkins Executor CPUs：0.2<br>Jenkins Executor Memory in MBs：0.2<br>Label String：mesos</p>
+<p>选中<code>Use Docker Containerizer</code>，即使用容器来做构建节点。</p>
+<p>参考以下Dockfile来构建镜像：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">#基础镜像是centos7</div><div class="line">FROM hub.com/centos:7.dumb-init</div><div class="line"> </div><div class="line">#镜像所有者</div><div class="line">MAINTAINER angrytester &quot;thx_phila@yahoo.com&quot;</div><div class="line"> </div><div class="line">#指定用户</div><div class="line">USER root</div><div class="line"> </div><div class="line">#新建相关目录</div><div class="line">RUN mkdir -p /jenkins/jdk1.7.0_75</div><div class="line"> </div><div class="line">COPY jdk1.7.0_75 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">#添加相关权限</div><div class="line">RUN chmod -R 777 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">#设置JENKINS_HOME环境变量，jenkins启动时自动从JENKINS_HOME下读取配置文件</div><div class="line">ENV JENKINS_HOME /jenkins/jenkins_home</div><div class="line"> </div><div class="line">#设置JAVA_HOME MAVEN_HOME ANT_HOME PATH环境变量</div><div class="line">ENV JAVA_HOME /jenkins/jdk1.7.0_75</div><div class="line">ENV PATH $PATH:$JAVA_HOME/bin</div><div class="line"> </div><div class="line">#暴露8080端口</div><div class="line">EXPOSE 8080</div></pre></td></tr></table></figure>
+<p>Docker Image中输入上面构建的镜像，其他都保持默认值，保存退出。</p>
+<p>进入Mesos UI页面可以看到新建的Jenkins框架已经注册成功。</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinsframe.png" alt=""></p>
+<p>首页可以看到当前资源使用情况如下图：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/reourcenew.png" alt=""></p>
+<p>占用的资源恰好是我们通过marathon启动jenkins时指定的CPU和内存大小。</p>
+<h3 id="第五步，测试。"><a href="#第五步，测试。" class="headerlink" title="第五步，测试。"></a>第五步，测试。</h3><p>我们新建5个job，只做sleep 100操作，构建节点指定为mesos。<br>启动所有job，就可以看到</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulnode.png" alt=""></p>
+<p>如下图，mesos开头的任务就是新起的构建节点，共启动了5个slave：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulslave.png" alt=""></p>
+<p>根据mesos插件的设置，每个slave占用0.2cpu和30m内存，所以最新的资源使用情况如下：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resourcenewest.png" alt=""></p>
+<p>两个slave节点的资源使用情况：</p>
+<p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/slaveresource.png" alt=""></p>
+<p>在job构建完成后，slave节点会自动回收。</p>
+<p>以上就是弹性的持续集成环境最直接的表现了，通过这种方案，我们可以将多台实体机器根据自己的需求分割成任意小块，每一块都可以作为一个构建节点。</p>
+<p>那么，所谓的高可用呢？</p>
+<p>下面，我们进入jenkins容器启动的宿主机，将jenkins容器实例强制销毁来模拟服务器出问题的情况。</p>
+<p>Jenkins经过一段时间不可访问之后，会自动重启，如果服务器A不可用，会自动在服务器B上重启，这就是marathon的作用了。marathon会不停地对服务进行健康检查，让检查到服务不可用时，就会自动转移故障，在其他可用的服务器上启动服务，这样就保证了持续集成环境的高可用性。由于Jenkins采用的文件系统存储,不同服务器上的配置文件同步,可以依赖Jenkins的插件(SCM Sync Configuration Plugin)完成.</p>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>虽然目前公司已经将持续集成环境由Jenkins转到了gitlab-ci平台,但是Jenkins在业界仍然有着不小的用户群体,因此这篇文章纯作为记录参考.</p>
+<p>Mesos算是分布式资源调度管理领域非常权威的一个框架，国内也已经有不少大公司在使用，而随着云技术的蓬勃发展，这个框架的应用场景也会越来越丰富。这次借着这次环境研究的机会，也算熟悉了一下这个框架。整个方案最先是由eBay提出，然后国内公司开始效仿，因为涉及到的技术都还没那么普及，所以整个方案的探索过程基本就是一部血泪史。可预见的是，除了应用在持续集成环境的建设中，这个方案中涉及的例如Mesos、Marathon、Zookeeper等等在未来的云平台建设过程中都有望发挥其作用。本文的这个方案还存在诸多不足，例如如何确保高可用同时的数据一致性，都值得我们进一步探索。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          
+            <a href="/tags/Mesos/" rel="tag"># Mesos</a>
+          
+            <a href="/tags/Marathon/" rel="tag"># Marathon</a>
+          
+            <a href="/tags/Docker/" rel="tag"># Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/09/hexo博客迁移/" rel="next" title="hexo博客迁移">
+                <i class="fa fa-chevron-left"></i> hexo博客迁移
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/12/Selenium-WebDriver-Grid-TestNG-Docker构建并行WebUI自动化测试框架/" rel="prev" title="Selenium WebDriver+Grid+TestNG+Docker构建并行WebUI自动化测试框架">
+                Selenium WebDriver+Grid+TestNG+Docker构建并行WebUI自动化测试框架 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">AngryTester</p>
+              <p class="site-description motion-element" itemprop="description">起点不论好坏，终点始终美好！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方案介绍"><span class="nav-number">2.</span> <span class="nav-text">方案介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一步，准备三台机器"><span class="nav-number">2.1.</span> <span class="nav-text">第一步，准备三台机器.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二步，安装相关工具并对服务器做相关配置。"><span class="nav-number">2.2.</span> <span class="nav-text">第二步，安装相关工具并对服务器做相关配置。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三步，通过marathon来发布一个jenkins应用。"><span class="nav-number">2.3.</span> <span class="nav-text">第三步，通过marathon来发布一个jenkins应用。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四步，我们需要对上一步启动的jenkins做一些配置。"><span class="nav-number">2.4.</span> <span class="nav-text">第四步，我们需要对上一步启动的jenkins做一些配置。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第五步，测试。"><span class="nav-number">2.5.</span> <span class="nav-text">第五步，测试。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写在最后"><span class="nav-number">3.</span> <span class="nav-text">写在最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">AngryTester</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

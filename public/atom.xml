@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>AngryTester</title>
+  
+  <subtitle>起点不论好坏，终点始终美好！</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2017-11-14T08:29:38.000Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>AngryTester</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>java调用shell</title>
+    <link href="http://yoursite.com/2017/11/14/java%E8%B0%83%E7%94%A8shell/"/>
+    <id>http://yoursite.com/2017/11/14/java调用shell/</id>
+    <published>2017-11-14T08:28:15.000Z</published>
+    <updated>2017-11-14T08:29:38.000Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.angrytest.utils;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.BufferedReader;</div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.InputStream;</div><div class="line"><span class="keyword">import</span> java.io.InputStreamReader;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SystemUtil</span> </span>&#123;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">openShell</span><span class="params">(<span class="keyword">final</span> String shellPath)</span> </span>&#123;</div><div class="line"><span class="keyword">new</span> Thread() &#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line"><span class="comment">// 需要读取输出流和错误流，否则程序执行到一半会挂起，参考：http://www.blogjava.net/alwayscy/archive/2009/05/15/270925.html</span></div><div class="line">Process process = <span class="keyword">null</span>;</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">process = <span class="keyword">new</span> ProcessBuilder(<span class="keyword">new</span> String[] &#123; <span class="string">"/bin/sh"</span>, <span class="string">"-c"</span>, shellPath &#125;).start();</div><div class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line"><span class="comment">// TODO Auto-generated catch block</span></div><div class="line">e.printStackTrace();</div><div class="line">&#125;</div><div class="line">StreamGobbler errorGobbler = <span class="keyword">new</span> StreamGobbler(process.getErrorStream(), <span class="string">"Error"</span>);</div><div class="line">StreamGobbler outputGobbler = <span class="keyword">new</span> StreamGobbler(process.getInputStream(), <span class="string">"Output"</span>);</div><div class="line">errorGobbler.start();</div><div class="line">outputGobbler.start();</div><div class="line">&#125;</div><div class="line">&#125;.run();</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">StreamGobbler</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</div><div class="line"></div><div class="line">InputStream is;</div><div class="line">String type;</div><div class="line"></div><div class="line">StreamGobbler(InputStream is, String type) &#123;</div><div class="line"><span class="keyword">this</span>.is = is;</div><div class="line"><span class="keyword">this</span>.type = type;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">InputStreamReader isr = <span class="keyword">new</span> InputStreamReader(is);</div><div class="line">BufferedReader br = <span class="keyword">new</span> BufferedReader(isr);</div><div class="line">String line = <span class="keyword">null</span>;</div><div class="line"><span class="keyword">while</span> ((line = br.readLine()) != <span class="keyword">null</span>) &#123;</div><div class="line"><span class="keyword">if</span> (type.equals(<span class="string">"Error"</span>))</div><div class="line">System.out.println(line);</div><div class="line"><span class="keyword">else</span></div><div class="line">System.out.println(line);</div><div class="line">&#125;</div><div class="line">&#125; <span class="keyword">catch</span> (IOException ioe) &#123;</div><div class="line">ioe.printStackTrace();</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div
+      
+    
+    </summary>
+    
+    
+      <category term="shell调用" scheme="http://yoursite.com/tags/shell%E8%B0%83%E7%94%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用maven原型快速搭建自动化测试项目框架</title>
+    <link href="http://yoursite.com/2017/11/09/%E4%BD%BF%E7%94%A8maven%E5%8E%9F%E5%9E%8B%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E9%A1%B9%E7%9B%AE%E6%A1%86%E6%9E%B6/"/>
+    <id>http://yoursite.com/2017/11/09/使用maven原型快速搭建自动化测试项目框架/</id>
+    <published>2017-11-09T06:58:16.000Z</published>
+    <updated>2017-11-09T07:10:48.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>在搭建自动化测试项目框架时，需要对一些配置文件进行特殊配置，例如特殊依赖，配置文件中的配置值，以前这种工作只能通过人工完成．依赖maven原型，可以快速搭建起全配置的自动化测试项目框架．</p><h2 id="如何生成原型"><a href="#如何生成原型" class="headerlink" title="如何生成原型"></a>如何生成原型</h2><ul><li><p>新建maven工程，将自动化测试项目需要的配置都准备好．</p></li><li><p>进行上面新建的工程目录，执行如何命令：</p></li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn archetype:create-from-project</div></pre></td></tr></table></figure><p>就会在工程目录下的target/generated-sources/archetype生成原型文件．</p><p>-　修改上一步生成的原型文件中的<code>pom.xml</code>，可修改原型名称，加入私服地址等，然后执行如下命令将原型工程打包上传至私服：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn deploy -Dmaven.test.skip=true</div></pre></td></tr></table></figure><p>原型就可以提供给私服的用户使用了．</p><p>##　如何通过原型生成自动化测试项目框架</p><h3 id="通过eclipse客户端"><a href="#通过eclipse客户端" class="headerlink" title="通过eclipse客户端"></a>通过eclipse客户端</h3><ul><li><p>首先新建一个Maven项目</p></li><li><p>不勾选创建简单项目点击下一步</p></li><li><p>点击Add Archetype(如果原型是SNAPSHOT版本，还得选择包含SNAPSHOT原型)</p></li><li><p>输入原型的groupId,artifactId,Version以及对应私服地址，这些信息都可以在生成原型的<code>pom.xml</code>中找到．</p></li></ul><h3 id="通过命令行"><a href="#通过命令行" class="headerlink" title="通过命令行"></a>通过命令行</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn archetype:generate -DarchetypeGroupId=com.angrytest -DarchetypeArtifactId=speedy-archetype -DremoteRepositories=http://localhost:8080/content/repositories/snapshots/ -DarchetypeVersion=0.0.1-SNAPSHOT -DgroupId=com.angrytest -DartifactId=demo -DinteractiveMode=false</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;使用场景&quot;&gt;&lt;a href=&quot;#使用场景&quot; class=&quot;headerlink&quot; title=&quot;使用场景&quot;&gt;&lt;/a&gt;使用场景&lt;/h2&gt;&lt;p&gt;在搭建自动化测试项目框架时，需要对一些配置文件进行特殊配置，例如特殊依赖，配置文件中的配置值，以前这种工作只能通过人工完成．
+      
+    
+    </summary>
+    
+    
+      <category term="maven，archetype" scheme="http://yoursite.com/tags/maven%EF%BC%8Carchetype/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>查询DNS解析域名对应IP</title>
+    <link href="http://yoursite.com/2017/11/08/%E6%9F%A5%E8%AF%A2DNS%E8%A7%A3%E6%9E%90%E5%9F%9F%E5%90%8D%E5%AF%B9%E5%BA%94IP/"/>
+    <id>http://yoursite.com/2017/11/08/查询DNS解析域名对应IP/</id>
+    <published>2017-11-08T00:52:32.000Z</published>
+    <updated>2017-11-08T00:55:01.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>挺简单一命令，公司搭建了内部DNS服务，经常需要查域名对应IP,使用以下命令即可：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nslookup test.com xxx.xx.xx.xxx(DNS地址)</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;挺简单一命令，公司搭建了内部DNS服务，经常需要查域名对应IP,使用以下命令即可：&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div
+      
+    
+    </summary>
+    
+    
+      <category term="IP，DNS" scheme="http://yoursite.com/tags/IP%EF%BC%8CDNS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TestNG实现失败重试功能</title>
+    <link href="http://yoursite.com/2017/11/07/TestNG%E5%AE%9E%E7%8E%B0%E5%A4%B1%E8%B4%A5%E9%87%8D%E8%AF%95%E5%8A%9F%E8%83%BD/"/>
+    <id>http://yoursite.com/2017/11/07/TestNG实现失败重试功能/</id>
+    <published>2017-11-07T07:21:49.000Z</published>
+    <updated>2017-11-07T08:12:26.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>前端自动化测试的稳定性是个很大的问题，在一些不追求速度追求稳定性的场景下，我们可以通过失败重试的功能来达到测试结果的稳定性．</p><h2 id="为什么需要记录下来"><a href="#为什么需要记录下来" class="headerlink" title="为什么需要记录下来"></a>为什么需要记录下来</h2><p>之前为了兼容JDK7的环境，TestNG的版本一直用的是6.9.6的版本，但是注意了，这个版本是有bug的，对于不带DataProvider的情况，重试功能可以正常使用，但是一旦加上数据驱动，运行结果就各种混乱了．因为这个版本问题，困住近一周．</p><p>自己也是一根筋，没有想到去TestNG的官方issue里找答案，结果在开发者的解答中说6.9.7版本已经解决这个bug，抱着试一试的心态更新了一下TestNG的版本，果然，结果正常了，瞬间想骂脏字．</p><h2 id="需要记录的几个点"><a href="#需要记录的几个点" class="headerlink" title="需要记录的几个点"></a>需要记录的几个点</h2><ul><li>1.TestNG的版本问题</li></ul><blockquote><p>这个前面已经说了，不再赘述．同时运行环境必须升级成JDK8.</p></blockquote><ul><li>2.关键是自定义监听实现<code>IRetryAnalyzer</code>接口:</li></ul><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">   <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;Long, Integer&gt; retryMap = <span class="keyword">new</span> HashMap&lt;Long, Integer&gt;();</div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> maxRetryCount = <span class="number">3</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isRetryAvailable</span><span class="params">(ITestResult result)</span> </span>&#123;</div><div class="line"><span class="keyword">return</span> retryMap.get(Thread.currentThread().getId()) &lt; maxRetryCount;</div><div class="line">&#125;</div><div class="line"></div><div class="line">   <span class="meta">@override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">retry</span><span class="params">(ITestResult result)</span> </span>&#123;</div><div class="line"><span class="keyword">if</span> (isRetryAvailable(result)) &#123;</div><div class="line"><span class="keyword">int</span> count = retryMap.remove(Thread.currentThread().getId());</div><div class="line">count++;</div><div class="line">System.out.println(result.getName() + <span class="string">"运行失败，下面进入"</span> + <span class="string">"第"</span> + count + <span class="string">"次"</span> + <span class="string">"重运行"</span>);</div><div class="line">Reporter.log(result.getName() + <span class="string">"运行失败，下面进入"</span> + <span class="string">"第"</span> + count + <span class="string">"次"</span> + <span class="string">"重运行"</span>);</div><div class="line">retryMap.put(Thread.currentThread().getId(), count);</div><div class="line"><span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">// retryCount = 0;</span></div><div class="line"><span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure><ul><li>3.多线程运行</li></ul><p>为了运行速度，我们还得把多线程加上，从上面的代码也可以看出来，我们会根据线程id来取对应的<code>count</code>来做判断．｀retryMap｀的初始化应该在每个方法执行开始时做．</p><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeInvocation</span><span class="params">(IInvokedMethod method, ITestResult testResult)</span> </span>&#123;</div><div class="line">        <span class="comment">// 按照线程id将重试次数初始化</span></div><div class="line">        <span class="keyword">if</span> (!retryMap.containsKey(Thread.currentThread().getId())) &#123;</div><div class="line">            retryMap.put(Thread.currentThread().getId(), <span class="number">0</span>);</div><div class="line">        &#125;</div><div class="line">        ...</div><div class="line">&#125;</div></pre></td></tr></table></figure><h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><blockquote><p>最大重试次数可以写在配置文件里，如果没有重试的属性或者属性值为0，则代表不重试．</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;使用场景&quot;&gt;&lt;a href=&quot;#使用场景&quot; class=&quot;headerlink&quot; title=&quot;使用场景&quot;&gt;&lt;/a&gt;使用场景&lt;/h2&gt;&lt;p&gt;前端自动化测试的稳定性是个很大的问题，在一些不追求速度追求稳定性的场景下，我们可以通过失败重试的功能来达到测试结果的稳定性．
+      
+    
+    </summary>
+    
+    
+      <category term="TestNg，Retry" scheme="http://yoursite.com/tags/TestNg%EF%BC%8CRetry/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Maven执行Sonar扫描命令</title>
+    <link href="http://yoursite.com/2017/11/02/maven%E6%89%A7%E8%A1%8Csonar%E6%89%AB%E6%8F%8F%E5%91%BD%E4%BB%A4/"/>
+    <id>http://yoursite.com/2017/11/02/maven执行sonar扫描命令/</id>
+    <published>2017-11-02T06:57:24.000Z</published>
+    <updated>2017-11-03T01:34:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>需要通过jacoco统计单元测试覆盖率，不需要对项目做配置，直接运行如下命令即可：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean org.jacoco:jacoco-maven-plugin:0.7.4.201502262128:prepare-agent  install sonar:sonar -Dmaven.test.failure.ignore=true -Dsonar.host.url=http://localhost:9000</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;需要通过jacoco统计单元测试覆盖率，不需要对项目做配置，直接运行如下命令即可：&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div
+      
+    
+    </summary>
+    
+    
+      <category term="Maven，Sonar" scheme="http://yoursite.com/tags/Maven%EF%BC%8CSonar/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何制订测试策略</title>
+    <link href="http://yoursite.com/2017/10/25/%E5%A6%82%E4%BD%95%E5%88%B6%E8%AE%A2%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5/"/>
+    <id>http://yoursite.com/2017/10/25/如何制订测试策略/</id>
+    <published>2017-10-25T01:08:08.000Z</published>
+    <updated>2017-10-25T03:19:07.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在上一篇&lt;敏捷研发模式下的质量控制&gt;中介绍了质量控制策略,测试活动是整个研发过程中质量控制活动的一部分.广义的测试活动包括研发全生命周期的测试,例如单元测试,集成测试等,而通常我们所说的测试活动仅指由测试人员完成的部分.</p><p>我们可以将产品的质量看成一个完整的积木模型,各个部分的质量合起来就形成产品的整体质量,所以如果我们能保证各个部分的质量,产品的质量自然就得到保证.</p><p>将产品质量进行切分常见的有两种方式:</p><ul><li><p>第一种是按照产品的架构进行切分,例如前后端分离,微服务架构等,都是从产品架构层面,将一个产品拆分成多个相对独立的部分,保证了这几个部分的质量,并辅以简单的连通性测试,产品的质量基本就得到了保证.</p></li><li><p>第二种是按照产品研发过程进行切分,例如将研发过程质量控制划分为编码阶段的质量控制,测试阶段的质量控制,运维阶段的质量控制等,这几个阶段的质量合力确保了整个产品的质量.</p></li></ul><h2 id="测试策略制订的意义"><a href="#测试策略制订的意义" class="headerlink" title="测试策略制订的意义"></a>测试策略制订的意义</h2><p>目前测试领域有两种相对”对立”的测试方案,一种是脚本式测试,另外一种是探索性测试.在这里我们暂且不讨论这两种测试方案的优劣,我们团队目前所采用的方案通常是第一种-脚本式测试.脚本式测试是指提前制订好较为详细的测试策略,执行时候按照测试策略执行,因此脚本式测试非常依赖测试策略的质量.</p><p>不完善的测试策略不仅可能造成测试工作的冗余,测试效率低下,甚至可能造成测试遗漏,将缺陷泄露到线上,而好的测试策略对测试的效率和质量都会有质的提升.</p><h2 id="测试策略的内容"><a href="#测试策略的内容" class="headerlink" title="测试策略的内容"></a>测试策略的内容</h2><p>在&lt;敏捷研发模式下的质量控制&gt;中已经提到,测试策略的内容建议至少包含以下几方面的内容:</p><h3 id="测试范围"><a href="#测试范围" class="headerlink" title="测试范围"></a>测试范围</h3><p>测试范围主要回答的是哪些需要测哪些不需要测的问题.但为什么会有功能不需要测试呢?</p><p>让我们来回想一下我们以往的测试工作,通常测试对象是应用本身,除非有明确的测试需求(例如配置变更),很少考虑针对线上服务器的测试.而对客户来说,使用的是一整套解决方案,这套方案中包含了应用本身,也包含配套的应用服务器,数据库甚至底层的机器.不管哪个部分出问题,客户不会纠结于是应用问题或是服务器问题,整体来看就是产品质量不合格.</p><p>为什么团队会遗留整个方案中的这部分不提交测试呢?实际情况是团队会根据历史情况,例如产品之前已经上过线,并且在线上运行一直平稳,当前版本上线并未对应用服务器进行变更,且功能中也不涉及与应用服务器配置相关的内容,因此评估风险之后决定这部分功能不需要专门测试.</p><p>这里提到一个词-“风险”.咱们的测试工作都可以看做是基于风险驱动的,如果无风险,就可以不用测试.以上的情况正是团队在评估风险之后,觉得无风险做出的决定.在我们的测试范围制订过程中,也应该和团队一起来评估项目风险,无风险的部分就可以不需要测试.</p><p>推荐做法是在制订测试策略时能够结合前序已完成的质量保证工作(例如主流程已经通过自动化冒烟测试保障)和本次提交测试的对象的变更范围(例如本次代码变更只涉及了一个模块中的几个类,与其他模块均不相关)从而确定本次测试范围.</p><h3 id="测试优先级"><a href="#测试优先级" class="headerlink" title="测试优先级"></a>测试优先级</h3><p>测试过程需要不断平衡成本和产出,测试无法穷尽已经是一句著名的”废话”.因此我们能做的就是在时间成本和人力成本有限的情况下,花最少的成本获得最大的产出,测试优先级回答的就是如何通过合理安排达成这个目的.</p><p>测试优先级如何来确定呢?我觉得大致可从以下几方面考虑.</p><ul><li>哪些部分可以先测</li></ul><p>在前言中提到可以将一个产品的质量切分成多个部分,通过保证每个部分的质量来保证整个产品的质量.当前研发架构的演进其实在很大程度上也考虑了产品的可测性,不管是微服务或者前后端分离,都将改变以前传统的测试方法,结合持续交付的理念,不再会等到产品完整成型之后才提交测试,而会在产出一部分成果之后就提交测试,后续再做一次连通性测试.</p><p>常见的情形有:接口提前产出,就可以提前对接口进行测试;前端页面提前产出,就可以考虑先测试页面元素的规格验证.总结来说,就是尽量提前测试,提前暴露问题.</p><ul><li>哪些功能比较重要</li></ul><p>若开发已完整提交产品测试,就需要考虑尽量提前测试最重要的部分.如何来评估哪些部分比较重要?这就依赖团队对各个功能模块的业务需求的理解.团队可以结合RBT(基于风险的测试)方法,为每个功能模块制定两个属性:风险影响和风险概率,风险影响乘以风险概率即得到功能模块的最终风险值,通过这个风险值可以简单对功能模块的优先级进行排序,然后团队就可根据优先级对测试顺序进行安排.</p><ul><li>哪些部分比较重要</li></ul><p>与上面一点不同的是针对一个选定的测试模块,也建议区分优先级.通常我们会将一个功能模块的测试内容划分为对页面布局的测试,对页面元素的测试以及功能流程的测试.从优先级考虑,我们应该将功能流程测试的优先级提升,而页面布局和页面元素的优先级降低.</p><p>在功能用例测试执行过程中,也应该区分不同优先级,例如先执行主业务流程的功能测试用例,再执行分支流程的用例,接着执行异常流程的用例,最后结合部分非常生僻的流程测试,整个测试就结束了.</p><h3 id="测试技术"><a href="#测试技术" class="headerlink" title="测试技术"></a>测试技术</h3><p>测试技术包括具体技术或者工具.在对测试对象进行分析时,首先考虑的是是否可以通过技术或者工具提升测试效率或者质量,比较常见的技术就是自动化测试.</p><p>针对接口类型的测试对象,如果项目架构和研发流程支持,都建议采取自动化的方式进行测试.自动化测试的优点除了提升本次测试效率,也有利于用例的存档.与手工测试用例不同的是,自动化测试存档的用例都是可持续运行的”活文档”,相较于传统的手工测试用例,更容易复用.</p><p>关于自动化测试在项目过程中如何实施这里就不铺开讲了,后续再通过其他文章介绍.</p><h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>以上的内容只是测试策略的一部分,其他一些常规内容如人员,时间的安排可根据项目实际情况添加,测试策略的内容有一部分是需要通过文档形式展现的,有一部分内容则是测试人员在测试执行过程中参考即可.本文是受最近看的&lt;软件测试人员价值提升之路&gt;的启发,结合个人见解和实际工作情况所总结,仅供参考.</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在上一篇&amp;lt;敏捷研发模式下的质量控制&amp;gt;中介绍了质量控制策略,测试活动是整个研发过程中质量控制活动的一部分.广义的测试活动包括研发全
+      
+    
+    </summary>
+    
+    
+      <category term="测试策略" scheme="http://yoursite.com/tags/%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5/"/>
+    
+      <category term="质量控制" scheme="http://yoursite.com/tags/%E8%B4%A8%E9%87%8F%E6%8E%A7%E5%88%B6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>敏捷研发模式下的质量控制</title>
+    <link href="http://yoursite.com/2017/10/16/%E6%95%8F%E6%8D%B7%E7%A0%94%E5%8F%91%E6%A8%A1%E5%BC%8F%E4%B8%8B%E7%9A%84%E8%B4%A8%E9%87%8F%E6%8E%A7%E5%88%B6/"/>
+    <id>http://yoursite.com/2017/10/16/敏捷研发模式下的质量控制/</id>
+    <published>2017-10-16T00:32:22.000Z</published>
+    <updated>2017-10-16T03:40:34.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>敏捷研发在领域内已经火了不是一天两天了,其具体内容与优势无须赘述.从研发团队的角度来说,转换一种新的研发模式必然是因为想达成之前的模式无法达成的目标,通常,我们会将这个目标定义为”加速交付”.这个目标比较笼统,从字面上理解,”加速”是核心,即我们追求更快的速度,但是从”交付”的定义上看,在追求效率的同时,我们会优先确保合格的质量.</p><p>如何确保质量?与传统研发模式一致,依赖研发过程质量控制.</p><h2 id="敏捷模式下的质量控制的特点"><a href="#敏捷模式下的质量控制的特点" class="headerlink" title="敏捷模式下的质量控制的特点"></a>敏捷模式下的质量控制的特点</h2><p>敏捷模式与传统模式的区别在于迭代频度更高,反馈效率更快.因此对于研发过程中的质量控制活动来说,也需要更快速的提供质量反馈从而实现快速响应.这有赖于后面会提到的自动化手段.</p><p>除此之外,传统的瀑布模式从组织上会更明确开发团队和测试团队的概念,而忽略研发团队的概念.举例来说就是开发人员负责开发,测试人员负责测试,我们并不否定这种职责划分,但是在敏捷研发模式下,这种界限会相对模糊,因为两者的工作会有大量交集,过于清晰反而不利于质量控制活动的开展.</p><h2 id="质量控制策略如何制定"><a href="#质量控制策略如何制定" class="headerlink" title="质量控制策略如何制定"></a>质量控制策略如何制定</h2><p>基于缺陷修复成本理论,缺陷越早发现修复成本越低,所以不管是传统模式还是敏捷模式,我们的质量控制策略都是会基于尽早发现问题为导向,一切延误问题发现时机的做法我们都将摈弃,一切加速问题发现时机的做法我们都建议引入.</p><h2 id="冲刺中的质量控制如何做"><a href="#冲刺中的质量控制如何做" class="headerlink" title="冲刺中的质量控制如何做"></a>冲刺中的质量控制如何做</h2><p>将传统模式下的交付周期缩短,即单个交付节点划分成多个更短的交付节点,是敏捷实施的第一步,每一个交付阶段我们称之为”冲刺”.在每一次完成的冲刺中,我们会完成传统模式的所有主要活动,包括设计,编码,测试等,所以我们的质量控制活动主要集中在每个”冲刺”中.</p><ul><li>质量控制第一步:明确交付标准</li></ul><p>质量的定义非常丰富,针对不同产品展现的形式都不同.质量控制活动与研发活动类似,都是通过一系列手段最终达成质量目标或交付目标.因此要实现有效的质量控制,首先必须明确质量标准,例如一个产品如果没有性能的要求,而在制定质量控制策略时却大量考虑性能相关的要求,就属于无用功了.</p><p>多数情况下,产品人员仅会提供一个较为笼统的交付标准,仅考虑功能要求(包含性能),而没有其他方面(如安全,代码健壮性等)的要求,而往往产品的质量需要考虑以上产品人员会考虑到的那些.因此,产品的交付标准依赖于整个团队(包括产品,开发,测试,运维)共同制定.</p><p>常见的交付标准包括:1.单元测试覆盖率100%;2.单元测试分支覆盖率30%+;3.代码合格率90%+;4.功能测试通过率100%等.</p><ul><li>质量控制第二步:分解交付标准</li></ul><p>按照传统模式的做法,第一步梳理出的交付标准,通常会通过投产之前的一次集中大扫除来达成.且不论项目进度是否允许团队能够腾出这样一段时间来集中做这件事,这种在项目投产前对代码做大量变更的做法,从风险管控上也是存在很大问题的,所以为了避免风险,通常的做法是临时将交付标准降低,之前制定的交付标准基本失效.</p><p>敏捷模式下会将交付标准进行分解,将质量控制工作分散到研发过程中的多个环节,从而减轻上线前修改代码的压力.</p><p>常见的分解方法是将代码质量控制活动放在代码提交前和代码合并前,将测试质量控制活动放手工测试前和投产上线前,即需满足一定交付标准才允许下一步操作.</p><ul><li>质量控制第三步:将质量控制活动自动化</li></ul><p>传统模式下的质量控制活动之所以滞后,很大一部分原因是因为质量控制活动成本过高,在研发过程中如果加入的质量控制需要耗费大量时间,严重影响研发进度.在敏捷模式下,由于迭代频度提升,质量控制活动更频繁,若还是采取以前的手工方式,成本必然无法承受,因此建议将质量控制活动自动化.</p><p>根据我们的实施经验,可自动化的质量控制手段包括静态代码扫描,自动化测试.</p><ul><li>质量控制第四步:制订质量控制过程规范</li></ul><p>在实现了质量控制活动的自动化后,我们就可以考虑将以上的质量控制活动加入到过程规范中了.我们将选取几个关键节点作为质量控制点:</p><pre><code>- 1.代码提交;- 2.代码合并;- 3.手工测试;- 4.投产发布;</code></pre><p>我们将之前分解的交付标准分解到这几个关键节点,即将必须满足一定交付标准作为这几个阶段的准入条件,举例来说:代码合格率必须达到90%以上才能提交成功,控制过程依赖我们上面实现的自动化.</p><ul><li>质量控制第五步:严格按照过程规范执行</li></ul><p>在做完以上准备工作之后,团队应该按照过程规范严格执行.在实际实施过程中,可能发现之前分解的交付标准不太合适,例如将静态扫描放在每次代码提交前,由于项目的代码量过多,导致每次扫描时间过长,开发人员无法忍受长时间等待,这种时候,首先应该考虑的不是先跳过这次检查,而是通过技术手段解决,例如模块化扫描或增量扫描.在通过技术手段仍无法解决时,才考虑交付标准的重新分解.</p><h2 id="交付标准分解的建议"><a href="#交付标准分解的建议" class="headerlink" title="交付标准分解的建议"></a>交付标准分解的建议</h2><ul><li>建议一:根据耗费时间长短对应操作节点</li></ul><p>我们都知道代码质量控制的相关活动都可以通过SonarQube工具扫描来完成,但实际的研发过程中,如果将代码质量控制的相关活动都放在一个节点完成,必然造成每一个节点耗费时间过长.因此建议将交付标准按照耗费时间长短进行分类,操作频繁的节点上只加入耗费时间较短的质量控制活动,而将耗费时间较长的活动加入操作不频繁的节点上.</p><p>例如在研发过程中,代码提交的动作会相对比较频繁,因此像静态扫描分析单元测试覆盖率的活动(如何代码量大的话),就不适合添加在这一环节.</p><ul><li>建议二:根据交付标准优先级对应操作节点</li></ul><p>质量要求对应的交付标准应该区分优先级,以功能要求和性能要求举例,功能是否可用肯定优先于系统最大能承受的用户数.在交付标准分解时,建议将优先级高的交付标准尽量往前,对应相对靠前的操作节点,而将优先级低的交付标准尽量往后,对应相对靠后的操作节点.</p><p>例如建议将自动化测试进行分类,自动化冒烟测试对应产品的主要功能,自动化回归测试对应产品的历史功能.自动化冒烟测试应该加入每次手工测试之前,而自动化回归测试只需要加入每次投产上线之前.这样做的目的在于在项目进度要求较紧的情况下,对质量控制活动做取舍时能够更加从容.</p><h2 id="关于手工测试的策略"><a href="#关于手工测试的策略" class="headerlink" title="关于手工测试的策略"></a>关于手工测试的策略</h2><p>以上的交付标准主要通过自动化实现,但是覆盖范围有限,团队仍然需要依赖大量的手工测试保障功能要求.不管是敏捷模式还是传统模式,我们都建议测试人员在测试开始之前都能够制定测试策略.</p><p>测试策略应该如何制定?建议至少考虑以下三方面的内容.</p><h3 id="需不需要测"><a href="#需不需要测" class="headerlink" title="需不需要测"></a>需不需要测</h3><p>这一点与传统模式有比较大的区别,之前已经提到过,敏捷模式下的开发和测试的界限非常模糊,因为两者的工作有大量交集.我们也希望通过敏捷的实施,能够让开发角色和测试角色相对模糊,开发人员也可能承担一部分测试的工作.是否所有的功能都需要提交给测试人员进行测试呢?一些简单功能是否只需开发自测就可以呢?已有的自动化测试是否已经可以覆盖呢?能够提炼出部分不需要测试人员进行手工测试的内容,也是研发团队充分自信的表现之一.</p><h3 id="应该先测什么后测什么"><a href="#应该先测什么后测什么" class="headerlink" title="应该先测什么后测什么"></a>应该先测什么后测什么</h3><p>测试工作的核心目标是尽快找出最重要的缺陷,因此我们的测试策略制定应该严格参考这一原则.我们应该将测试对象按照优先级分类,优先级的分类应该参考功能模块的业务复杂程度(缺陷出现的概率),商业角度的重要性(遗漏缺陷对客户的影响程度),客户的使用频度(遗留缺陷的概率),代码实现的复杂性(缺陷修复的成本)等方面考虑.</p><h3 id="应该如何测试"><a href="#应该如何测试" class="headerlink" title="应该如何测试"></a>应该如何测试</h3><p>自动化or手工?采用什么工具?是否有现成工具?</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>敏捷模式下的质量控制策略与传统模式的最大区别是更一体化.将质量交给测试控制的做法已经”过时”了.敏捷的实施希望能够让团队对产品质量有一个统一认识,并一起规划质量控制活动.</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;敏捷研发在领域内已经火了不是一天两天了,其具体内容与优势无须赘述.从研发团队的角度来说,转换一种新的研发模式必然是因为想达成之前的模式无法达
+      
+    
+    </summary>
+    
+    
+      <category term="pipeline" scheme="http://yoursite.com/tags/pipeline/"/>
+    
+      <category term="测试策略" scheme="http://yoursite.com/tags/%E6%B5%8B%E8%AF%95%E7%AD%96%E7%95%A5/"/>
+    
+      <category term="质量控制" scheme="http://yoursite.com/tags/%E8%B4%A8%E9%87%8F%E6%8E%A7%E5%88%B6/"/>
+    
+      <category term="敏捷" scheme="http://yoursite.com/tags/%E6%95%8F%E6%8D%B7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>shell判断sonar的质量门结果</title>
+    <link href="http://yoursite.com/2017/10/12/shell%E5%88%A4%E6%96%ADsonar%E7%9A%84%E8%B4%A8%E9%87%8F%E9%97%A8%E7%BB%93%E6%9E%9C/"/>
+    <id>http://yoursite.com/2017/10/12/shell判断sonar的质量门结果/</id>
+    <published>2017-10-12T07:08:03.000Z</published>
+    <updated>2017-10-12T07:24:21.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>Jenkins虽然有质量门插件,但是存在的问题是通过命令行触发静态扫描完成后,会将扫描结果发送至Sonarqube进行解析,解析需要一定时间,因此如果在解析未完成的时候获取质量门结果,有可能获取到上一次的扫描结果.</p><h2 id="脚本内容"><a href="#脚本内容" class="headerlink" title="脚本内容"></a>脚本内容</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#默认后面跟的第一个参数就是sonar服务地址,第二个参数为项目代码</div><div class="line"> sonar_url=$1</div><div class="line"> CI_PROJECT_NAME=$2</div><div class="line"></div><div class="line">#执行sonar</div><div class="line"></div><div class="line">mvn sonar:sonar -Dsonar.host.url=$sonar_url</div><div class="line"></div><div class="line">#获取projectKey</div><div class="line"></div><div class="line">projectKey=com.travelsky.$(echo $CI_PROJECT_NAME | tr &apos;[A-Z]&apos; &apos;[a-z]&apos;):$(echo $CI_PROJECT_NAME | tr &apos;[A-Z]&apos; &apos;[a-z]&apos;)</div><div class="line"></div><div class="line">#获取componentId</div><div class="line"></div><div class="line">curl -s $sonar_url/api/components/show?key=$projectKey &gt; component.json</div><div class="line"></div><div class="line">componentId=$(jq .component.id component.json | sed &apos;s/\&quot;//g&apos;)</div><div class="line"></div><div class="line">#等待当前项目无in progress任务</div><div class="line">while [[ $QUEUE != [] ]]</div><div class="line">do</div><div class="line">curl -s $sonar_url/api/ce/component?componentId=$componentId &gt; task.json</div><div class="line">QUEUE=$(jq .queue task.json)</div><div class="line">echo &quot;等待Sonar解析任务完成...&quot;</div><div class="line">done</div><div class="line"></div><div class="line">#获取qualitygateStatus</div><div class="line">curl -s $sonar_url/api/qualitygates/project_status?projectKey=$projectKey &gt; qualitygate.json</div><div class="line"></div><div class="line">qualitygateStatus=$(jq .projectStatus.status qualitygate.json | sed &apos;s/\&quot;//g&apos;)</div><div class="line"></div><div class="line">#判断如果qualitygateStatus不为OK，则终止</div><div class="line">if [[ $qualitygateStatus != OK ]]</div><div class="line">then</div><div class="line">echo &quot;质量门不通过，请查看Sonar结果详情！$sonar_url/dashboard?id=$projectKey&quot;</div><div class="line">exit 1</div><div class="line">else</div><div class="line">echo &quot;质量门通过&quot;</div><div class="line">fi</div></pre></td></tr></table></figure><h2 id="使用方法和注意事项"><a href="#使用方法和注意事项" class="headerlink" title="使用方法和注意事项"></a>使用方法和注意事项</h2><h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chkgate http://localhost:9000 Demo</div></pre></td></tr></table></figure><h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul><li><p>1.不同版本sonar可能api有所区别,需要做调整.本脚本基于sonarqube6.4版本.</p></li><li><p>2.需要用到jq工具解析json串.需要安装.</p></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;使用场景&quot;&gt;&lt;a href=&quot;#使用场景&quot; class=&quot;headerlink&quot; title=&quot;使用场景&quot;&gt;&lt;/a&gt;使用场景&lt;/h2&gt;&lt;p&gt;Jenkins虽然有质量门插件,但是存在的问题是通过命令行触发静态扫描完成后,会将扫描结果发送至Sonarqube进行解析,
+      
+    
+    </summary>
+    
+    
+      <category term="sonar" scheme="http://yoursite.com/tags/sonar/"/>
+    
+      <category term="quliaty gate" scheme="http://yoursite.com/tags/quliaty-gate/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Selenium WebDriver+Grid+TestNG+Docker构建并行WebUI自动化测试框架</title>
+    <link href="http://yoursite.com/2017/10/12/Selenium-WebDriver-Grid-TestNG-Docker%E6%9E%84%E5%BB%BA%E5%B9%B6%E8%A1%8CWebUI%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6/"/>
+    <id>http://yoursite.com/2017/10/12/Selenium-WebDriver-Grid-TestNG-Docker构建并行WebUI自动化测试框架/</id>
+    <published>2017-10-12T01:46:16.000Z</published>
+    <updated>2017-10-12T02:04:09.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>尽管当前业界各路言论都严重不看好WebUI层的自动化测试，但是不管是“质量金字塔”或是“721原则”，尽管优先级较低，UI层的自动化却仍有一席之地。UI层的测试最接近真实用户使用习惯，因此在一些特定场景下，仍发挥着不可替代的作用，最典型的场景就是冒烟测试。冒烟测试的意义在于快速发现质量缺陷，这类缺陷通常是流程性的较严重的功能问题，并且通常会严重影响用户使用。因此在设计冒烟测试用例时，通常会依据实际用户使用习惯，这时候，从前端页面驱动测试就很有必要了。</p><h2 id="方案介绍"><a href="#方案介绍" class="headerlink" title="方案介绍"></a>方案介绍</h2><h3 id="1-WebDriver和Grid"><a href="#1-WebDriver和Grid" class="headerlink" title="1.WebDriver和Grid"></a>1.WebDriver和Grid</h3><p>WebDriver已经是业界比较通用的UI自动化测试解决方案，相比Selenium1，抛弃了通过执行JS驱动浏览器的方式，而是通过直接调用浏览器的原生态接口来操作。由于得到浏览器厂商的支持，因此稳定性上面比Selenium1提升了不少。WebDriver是典型的“C/S”架构，启动时会现在本地起一个server绑定到指定端口，然后client端通过发送各种指令到server,server解析之后帮助我们达到操作浏览器的目的。也正是由于这种”C/S”的架构，client端支持各种语言的开发。</p><p>Grid是Selenium的另外一个产品，主要解决的是分布式测试运行的问题。Grid启动之后，会在指定的远程服务器上启动一个hub，然后所有的WebDriver命令都会通过这个hub转发至注册到这个hub的所有node上，从而达到分布执行的效果。</p><p>由于UI自动化测试需要驱动浏览器，浏览器自身的机制可能导致在同一台服务器上的多个浏览器操作互相影响，使用传统的WebDriver多线程并发操作会出现问题，因此需要结合Grid将不同用例分发至不同node运行，以此避免不同用例操作互相影响。</p><h3 id="2-TestNG"><a href="#2-TestNG" class="headerlink" title="2.TestNG"></a>2.TestNG</h3><p>TestNG是一个与JUnit类似的测试驱动框架。这里之所以选择TestNG是因为们要使用到它原生支持的并发策略。这也是它比JUnit强大的其中一方面。TestNG并发可以在多个级别,参考官网介绍：</p><ul><li>parallel=”methods”: TestNG will run all your test methods in separate threads. Dependent methods will also run in separate threads but they will respect the order that you specified.</li></ul><ul><li>parallel=”tests”: TestNG will run all the methods in the same <test> tag in the same thread, but each <test> tag will be in a separate thread. This allows you to group all your classes that are not thread safe in the same <test> and guarantee they will all run in the same thread while taking advantage of TestNG using as many threads as possible to run your tests.</test></test></test></li></ul><ul><li>parallel=”classes”: TestNG will run all the methods in the same class in the same thread, but each class will be run in a separate thread.</li></ul><ul><li>parallel=”instances”: TestNG will run all the methods in the same instance in the same thread, but two methods on two different instances will be running in different threads.</li></ul><p>只需要在TestNG的驱动文件testng.xml中加上<code>parallel=&quot;xx&quot;</code>，并通<code>thread-count=&quot;x&quot;</code>指定并发线程数，即可以实现并发执行。</p><h3 id="3-Docker"><a href="#3-Docker" class="headerlink" title="3.Docker"></a>3.Docker</h3><p>由于需要多个node供并发运行，node之间的相互隔离主要是通过服务器之间的隔离，如果使用传统隔离方式，我们可能需要多台实体机或虚拟机，这需要耗费大量资源且不好管理，并且由于自动化测试运行环境的依赖众多，环境的初始化也是个大工程。Docker的出现正好解决了这个问题。</p><p>官方已经提供了hub和各种浏览器node的镜像：<a href="https://github.com/SeleniumHQ/docker-selenium" target="_blank" rel="external">https://github.com/SeleniumHQ/docker-selenium</a></p><p>我们需要做的是在官方镜像的基础上做一些定制化，例如中文的支持,以chrome节点为例，Dockerfile参考如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">FROM selenium/node-chrome-debug</div><div class="line"></div><div class="line">MAINTAINER angrytester &lt;thx_phila@yahoo.com&gt;</div><div class="line"></div><div class="line">USER root</div><div class="line"></div><div class="line">VOLUME /etc/shm</div><div class="line"></div><div class="line">RUN  apt-get update \</div><div class="line">    &amp;&amp; apt-get -y install ttf-wqy-microhei ttf-wqy-zenhei \</div><div class="line">    &amp;&amp; apt-get clean</div><div class="line">    </div><div class="line">USER seluser</div></pre></td></tr></table></figure><p>注意官方的节点镜像分为带debug和不带debug的，区别在于带debug的镜像中自带启动一个vncserver，可通过vncviewer连接到容器查看浏览器运行情况，在重新制作镜像时要注意，必须将USER重新指定为seluser，否则vncserver会无法启动。启动的vncserver默认连接密码为<code>secret</code>。</p><h3 id="hub和node的启动"><a href="#hub和node的启动" class="headerlink" title="hub和node的启动"></a>hub和node的启动</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">docker run -d --name hub -p 4444:4444 hub:1.0 </div><div class="line">docker run -d --link hub:hub -p 5900:5900 node:1.0 </div><div class="line">docker run -d --link hub:hub -p 5901:5900 node:1.0</div></pre></td></tr></table></figure><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>在当前强调持续快速交付的情况下，快速反馈尤为重要，并行自动化测试实现用空间（服务器资源）换取时间，是持续交付过程中可考虑的实践之一。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;尽管当前业界各路言论都严重不看好WebUI层的自动化测试，但是不管是“质量金字塔”或是“721原则”，尽管优先级较低，UI层的自动化却仍有一
+      
+    
+    </summary>
+    
+    
+      <category term="Grid" scheme="http://yoursite.com/tags/Grid/"/>
+    
+      <category term="并行自动化" scheme="http://yoursite.com/tags/%E5%B9%B6%E8%A1%8C%E8%87%AA%E5%8A%A8%E5%8C%96/"/>
+    
+      <category term="TestNG" scheme="http://yoursite.com/tags/TestNG/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mesos+Marathon+Docker+Jenkins打造弹性高可用持续集成环境</title>
+    <link href="http://yoursite.com/2017/10/11/Mesos-Marathon-Docker-Jenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/"/>
+    <id>http://yoursite.com/2017/10/11/Mesos-Marathon-Docker-Jenkins打造弹性高可用持续集成环境/</id>
+    <published>2017-10-11T03:50:15.000Z</published>
+    <updated>2017-10-12T01:08:18.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,可预见的是构建任务会越来越多,对持续集成环境的要求也越来越高.目前持续集成环境采取的方案是单master节点+多slave节点的传统方式,随着任务量越来越大,暴露出几个明显的问题:</p><ul><li>1.构建节点数不够：带来的直接影响是如果多任务并发，将会有大量任务由于没有可用构建节点而需要长时间的等待。这对于持续交付要求的快速反馈是非常不利的。</li><li>2.分发服务器资源利用率不均：这一点与Jenkins自身的分发机制有关，单任务只能指定构建节点，即必须指定服务器。带来的影响是如果构建策略命中的任务只集中在一台服务器构建，那么可能指定的这台服务器基本满载，而另外的分发服务器可能是空闲的。</li><li>3.环境可用性差：目前环境的维护是纯靠手工的，特别是在服务器出现问题之后，需要人工及时重启，如果维护人员没有及时知晓，可能环境长时间不可用，这对于生产工作也是极为不利的。</li></ul><p>基于以上存在的问题，我们引入了Mesos+Marathon+Docker+Jenkins的技术方案来搭建一个弹性高可用的持续集成环境。</p><h2 id="方案介绍"><a href="#方案介绍" class="headerlink" title="方案介绍"></a>方案介绍</h2><p>首先，我们先来了解一下这个方案中涉及到的新工具。</p><ul><li>1.Mesos</li></ul><p>Mesos是Apache下的开源分布式资源管理框架，它被称为是分布式系统的内核。以下是官网给出的架构图。Mesos包括master和agent，其中master负责调度，agent负责执行。agent上任务的执行实际是通过executor来完成的，并且任务不会直接执行在agent的操作系统上，而是运行在一个相对隔离的沙箱环境，这样一方面是保证了安全性，另外一方面也确保了在同一个agent上可能运行多个任务而不会互相影响。这一点相对Jenkins目前的分发策略完全是个颠覆，有了这个机制，一台分发服务器就可以当做多个构建节点来使用了。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesos.png" alt=""></p><p>-2.Marathon</p><p>马拉松重点解决的问题是服务不可用时的处理。从上面Mesos的架构图也可以看出，Mesos本身是不具备调度任务的功能的，必须得借助Framework来完全，例如上图中的Hadoop和MPI就是属于这类框架。Marathon也是属于调度任务的框架，并且有一个很好的特点，在节点任务执行时候时，可以结合Mesos自动选择其他节点重新执行任务，这样就保证了任务的长时间运行，这对于Jenkins所要求的长时可用非常重要。以下是官网给出的Marathon和Mesos结合使用的架构图。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathon.png" alt=""></p><ul><li>3.Docker</li></ul><p>Docker容器的隔离性、一致性用于快速Jenkins构建环境将会是绝配。这个方案中，我们将使用到两个镜像，一个镜像是Jenkins服务，另一个是Jenkins的构建节点，通过Docker镜像可以很方便的复制出多个一致的构建环境，并且各个环境运行在一台实体服务器上而不会互相影响。</p><ul><li>4.Jenkins</li></ul><p>公司去年的持续集成环境主要就是基于Jenkins(虽然现在已转移到gitlab-ci)。在这个方案中，我们将用到Jenkins的mesos插件，这个插件实际上实现了一个framework，通过这个framework结合Mesos可以帮助我们在单台实体服务器上申请多个构建环境运行构建任务，且各个构建环境之间不会互相影响，后续会详细介绍这个插件的配置。 </p><p>以上介绍完了这个方案中涉及到的工具，下面的具体的实现方案。</p><h3 id="第一步，准备三台机器"><a href="#第一步，准备三台机器" class="headerlink" title="第一步，准备三台机器."></a>第一步，准备三台机器.</h3><p>考虑到要使用docker，我这里的准备的是三台CentOS7。</p><p>机器1：我们会在这台机器上运行Mesos Master，Marathon和Zookeeper。<br>机器2、机器3：这两台机器作为Mesos Slave，运行Jenkins环境以及分发的构建环<br>境。</p><p>先配置三台机器的hosts： </p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">172.26.1.1 master</div><div class="line">172.26.1.2 slave1</div><div class="line">172.26.1.3 slave2</div></pre></td></tr></table></figure><p>以上IP为虚拟，做演示用，实际配置请根据你的机器的实际IP。</p><h3 id="第二步，安装相关工具并对服务器做相关配置。"><a href="#第二步，安装相关工具并对服务器做相关配置。" class="headerlink" title="第二步，安装相关工具并对服务器做相关配置。"></a>第二步，安装相关工具并对服务器做相关配置。</h3><p>根据上面的安排，我们将在机器1上安装Mesos、Marathon、Zookeeper。</p><ul><li>1.安装mesos源。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#配置Mesos源</div><div class="line">rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm</div></pre></td></tr></table></figure><ul><li>2.安装工具。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install mesos marathon mesosphere-zookeeper</div></pre></td></tr></table></figure><ul><li>3.配置Zookeeper。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">cd /etc/zookeeper/conf</div><div class="line">grep -v &quot;#&quot; zoo_sample.cfg &gt;zoo.cfg</div><div class="line">vi zoo.cfg</div><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/var/lib/zookeeper</div><div class="line">clientPort=2181</div><div class="line">server.1=172.26.1.1:2888:3888</div><div class="line">echo 1&gt;myid</div><div class="line">vi /etc/mesos/zk</div><div class="line">zk://172.26.1.1:2181/mesos</div></pre></td></tr></table></figure><ul><li>4.配置Marathon。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">cd /etc/marathon/conf</div><div class="line">vi hostname</div><div class="line">172.26.1.1</div><div class="line">vi master</div><div class="line">zk://172.26.1.1:2181/mesos</div><div class="line">vi zk</div><div class="line">zk://172.26.1.1:2181/marathon</div></pre></td></tr></table></figure><ul><li>5.配置Mesos Master。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">cd /etc/mesos-master</div><div class="line">vi cluster</div><div class="line">#输入任意你定义的集群的名称，如：vms</div><div class="line">vi hostname</div><div class="line">#输入master的服务器IP，如：172.26.1.1</div><div class="line">vi ip</div><div class="line">#输入master的ip，如：172.26.1.1</div></pre></td></tr></table></figure><ul><li>6.启动Master上的相关服务。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">systemctl start zookeeper</div><div class="line">systemctl start mesos-master</div><div class="line">systemctl start marathon</div></pre></td></tr></table></figure><p>访问<a href="http://172.26.1.1:5050就能看到Mesos" target="_blank" rel="external">http://172.26.1.1:5050就能看到Mesos</a> UI界面，如下图所示：</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosui.png" alt=""></p><p>点击<code>Frameworks</code>标签页，可看到已注册了一个framework，即我们在master上启动的marathon。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/frame.png" alt=""></p><p>以上master的配置完成。</p><p>下面对两个slave进行配置，根据上面的安排，我们需要在两个slave上安装docker和mesos。</p><ul><li>1.安装mesos源和docker源。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#配置Mesos源</div><div class="line">rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm</div></pre></td></tr></table></figure><ul><li>2.安装docker和mesos。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install docker mesos</div></pre></td></tr></table></figure><ul><li>3.配置mesos-slave。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">#设置slave支持docker容器。</div><div class="line">cd /etc/mesos-slave</div><div class="line">vi containerizers</div><div class="line">docker,mesos</div><div class="line">#设置执行器注册超时时间。</div><div class="line">vi executor_registration_timeout</div><div class="line">5mins</div><div class="line">vi hostname</div><div class="line">172.26.1.2（或172.26.1.3）</div><div class="line">vi ip</div><div class="line">172.26.1.2（或172.26.1.3）</div><div class="line">#设置zookeeper地址。</div><div class="line">vi /etc/mesos/zk</div><div class="line">zk://172.26.1.1:2181/mesos</div></pre></td></tr></table></figure><ul><li>4.启动。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">systemctl start mesos-slave</div><div class="line">systemctl start docker</div></pre></td></tr></table></figure><p>启动完之后，再进入Mesos UI界面刷新查看，再点击<code>Agents</code>标签页，可以看到两个slave机器都已经连接上了。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/agent.png" alt=""></p><p>从首页可以看到目前可用的资源总量。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resource.png" alt=""></p><p>至此，服务器的配置结束。</p><h3 id="第三步，通过marathon来发布一个jenkins应用。"><a href="#第三步，通过marathon来发布一个jenkins应用。" class="headerlink" title="第三步，通过marathon来发布一个jenkins应用。"></a>第三步，通过marathon来发布一个jenkins应用。</h3><p>首先，我们需要做一个jenkins镜像，可参考如下<code>Dockfile</code>：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">#基础镜像是centos7</div><div class="line">FROM hub.com/centos:7.dumb-init</div><div class="line"> </div><div class="line">#镜像所有者</div><div class="line">MAINTAINER angrytester &quot;thx_phila@yahoo.com&quot;</div><div class="line"> </div><div class="line">#指定用户</div><div class="line">USER root</div><div class="line"> </div><div class="line">#新建相关目录</div><div class="line">RUN mkdir -p /jenkins/jdk1.7.0_75</div><div class="line"> </div><div class="line">#安装mesos marathon</div><div class="line">RUN rpm -Uvh http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm\</div><div class="line">&amp;&amp; yum install -y mesos</div><div class="line"> </div><div class="line">COPY jdk1.7.0_75 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">COPY jenkins.war /jenkins/</div><div class="line"> </div><div class="line">#添加启动脚本至根目录</div><div class="line">COPY start.sh /</div><div class="line"> </div><div class="line">#添加相关权限</div><div class="line">RUN chmod -R 777 /jenkins/jdk1.7.0_75/\</div><div class="line">&amp;&amp; chmod -R 777 /jenkins/jenkins.war</div><div class="line"> </div><div class="line">#设置JENKINS_HOME环境变量，jenkins启动时自动从JENKINS_HOME下读取配置文件</div><div class="line">ENV JENKINS_HOME /jenkins/jenkins_home</div><div class="line"> </div><div class="line">#设置JAVA_HOME MAVEN_HOME ANT_HOME PATH环境变量</div><div class="line">ENV JAVA_HOME /jenkins/jdk1.7.0_75</div><div class="line">ENV PATH $PATH:$JAVA_HOME/bin</div><div class="line"> </div><div class="line">#暴露8080端口</div><div class="line">EXPOSE 8080</div><div class="line"> </div><div class="line">#容器启动时运行脚本</div><div class="line">CMD [&quot;/bin/sh&quot;,&quot;/start.sh&quot;]</div></pre></td></tr></table></figure><p><code>start.sh</code>的内容如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#!/bin/sh</div><div class="line"> </div><div class="line">#jenkins启动命令</div><div class="line">/jenkins/jdk1.7.0_75/bin/java -jar /jenkins/jenkins.war</div></pre></td></tr></table></figure><p>说明：镜像里面安装了mesos，主要是为后面在jenkins中使用mesos插件准备，因为mesos插件需要用到mesos的库文件。</p><p>访问172.26.1.1:8080可以看到marathon的UI界面，点击<code>Create Application</code>按钮，<code>ID</code>输入：Jenkins，<code>CPU</code>输入：0.2，<code>Memory</code>输入256，其他默认。</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/marathonui.png" alt=""></p><p>点击<code>Docker Container</code>，<code>Image</code>输入上一步中我们打好的镜像，<code>Network</code>选择Host，其他默认。</p><p> 点击<code>Volumes</code>设置容器存储挂载，如下图：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/volumn.png" alt=""></p><p> 因为镜像中jenkins的主目录设置为/jenkins/jenkins_home，所以将容器里的对应目录挂载到本地服务器的/jenkins目录下，这样容器里jenkins产生的所有数据都会在本地服务器的/jenkins目录下了。</p><p>最后点击Create Application按钮，等几分钟，就可以看到任务状态变成了运行中。（需要注意，上面打的镜像我们需要提前docker pull到服务器上，因为marathon会直接docker run镜像，而不会做pull操作）</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/running.png" alt=""></p><p>点击任务查看任务详情，可以看到任务是在哪一台服务器上运行。</p><p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkins.png" alt=""></p><p> 输入对应服务器IP:8080，就可以访问到对应的jenkins了。</p><p>在Mesos UI首页，也可以看到正在运行的jenkins任务。</p><p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/runningjenkins.png" alt=""></p><p>点击Sandbox，从下图中两个链接就可以看到jenkins的输出日志（jenkins第一次启动所需的密码可以从这里获得）:</p><p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinslog.png" alt=""></p><h3 id="第四步，我们需要对上一步启动的jenkins做一些配置。"><a href="#第四步，我们需要对上一步启动的jenkins做一些配置。" class="headerlink" title="第四步，我们需要对上一步启动的jenkins做一些配置。"></a>第四步，我们需要对上一步启动的jenkins做一些配置。</h3><p>安装mesos插件。</p><p>  <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mesosplugin.png" alt=""></p><p>插件安装完成之后，进入系统管理→系统设置，会看到多了下面这一项：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/addcloud.png" alt=""></p><p> 新增一个云：</p><p> Mesos native library path：/usr/lib/libmesos.so<br>Mesos Master [hostname:port]：172.26.1.1:5050<br>On-demand framework registration：no<br>Jenkins Slave CPUs：0.2<br>Jenkins Slave Memory in MB：30<br>Minimum number of Executors per Slave：1<br>Maximum number of Executors per Slave：1<br>Jenkins Executor CPUs：0.2<br>Jenkins Executor Memory in MBs：0.2<br>Label String：mesos</p><p>选中<code>Use Docker Containerizer</code>，即使用容器来做构建节点。</p><p>参考以下Dockfile来构建镜像：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">#基础镜像是centos7</div><div class="line">FROM hub.com/centos:7.dumb-init</div><div class="line"> </div><div class="line">#镜像所有者</div><div class="line">MAINTAINER angrytester &quot;thx_phila@yahoo.com&quot;</div><div class="line"> </div><div class="line">#指定用户</div><div class="line">USER root</div><div class="line"> </div><div class="line">#新建相关目录</div><div class="line">RUN mkdir -p /jenkins/jdk1.7.0_75</div><div class="line"> </div><div class="line">COPY jdk1.7.0_75 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">#添加相关权限</div><div class="line">RUN chmod -R 777 /jenkins/jdk1.7.0_75/</div><div class="line"> </div><div class="line">#设置JENKINS_HOME环境变量，jenkins启动时自动从JENKINS_HOME下读取配置文件</div><div class="line">ENV JENKINS_HOME /jenkins/jenkins_home</div><div class="line"> </div><div class="line">#设置JAVA_HOME MAVEN_HOME ANT_HOME PATH环境变量</div><div class="line">ENV JAVA_HOME /jenkins/jdk1.7.0_75</div><div class="line">ENV PATH $PATH:$JAVA_HOME/bin</div><div class="line"> </div><div class="line">#暴露8080端口</div><div class="line">EXPOSE 8080</div></pre></td></tr></table></figure><p>Docker Image中输入上面构建的镜像，其他都保持默认值，保存退出。</p><p>进入Mesos UI页面可以看到新建的Jenkins框架已经注册成功。</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/jenkinsframe.png" alt=""></p><p>首页可以看到当前资源使用情况如下图：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/reourcenew.png" alt=""></p><p>占用的资源恰好是我们通过marathon启动jenkins时指定的CPU和内存大小。</p><h3 id="第五步，测试。"><a href="#第五步，测试。" class="headerlink" title="第五步，测试。"></a>第五步，测试。</h3><p>我们新建5个job，只做sleep 100操作，构建节点指定为mesos。<br>启动所有job，就可以看到</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulnode.png" alt=""></p><p>如下图，mesos开头的任务就是新起的构建节点，共启动了5个slave：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/mulslave.png" alt=""></p><p>根据mesos插件的设置，每个slave占用0.2cpu和30m内存，所以最新的资源使用情况如下：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/resourcenewest.png" alt=""></p><p>两个slave节点的资源使用情况：</p><p> <img src="https://raw.githubusercontent.com/AngryTester/blog/master/Mesos%2BMarathon%2BDocker%2BJenkins%E6%89%93%E9%80%A0%E5%BC%B9%E6%80%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83/slaveresource.png" alt=""></p><p>在job构建完成后，slave节点会自动回收。</p><p>以上就是弹性的持续集成环境最直接的表现了，通过这种方案，我们可以将多台实体机器根据自己的需求分割成任意小块，每一块都可以作为一个构建节点。</p><p>那么，所谓的高可用呢？</p><p>下面，我们进入jenkins容器启动的宿主机，将jenkins容器实例强制销毁来模拟服务器出问题的情况。</p><p>Jenkins经过一段时间不可访问之后，会自动重启，如果服务器A不可用，会自动在服务器B上重启，这就是marathon的作用了。marathon会不停地对服务进行健康检查，让检查到服务不可用时，就会自动转移故障，在其他可用的服务器上启动服务，这样就保证了持续集成环境的高可用性。由于Jenkins采用的文件系统存储,不同服务器上的配置文件同步,可以依赖Jenkins的插件(SCM Sync Configuration Plugin)完成.</p><h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>虽然目前公司已经将持续集成环境由Jenkins转到了gitlab-ci平台,但是Jenkins在业界仍然有着不小的用户群体,因此这篇文章纯作为记录参考.</p><p>Mesos算是分布式资源调度管理领域非常权威的一个框架，国内也已经有不少大公司在使用，而随着云技术的蓬勃发展，这个框架的应用场景也会越来越丰富。这次借着这次环境研究的机会，也算熟悉了一下这个框架。整个方案最先是由eBay提出，然后国内公司开始效仿，因为涉及到的技术都还没那么普及，所以整个方案的探索过程基本就是一部血泪史。可预见的是，除了应用在持续集成环境的建设中，这个方案中涉及的例如Mesos、Marathon、Zookeeper等等在未来的云平台建设过程中都有望发挥其作用。本文的这个方案还存在诸多不足，例如如何确保高可用同时的数据一致性，都值得我们进一步探索。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;去年作为公司的持续集成环境的主要维护人员,将基于Jenkins的持续集成环境搭建起来,并维护了近300个Job,随着持续交付陆续在公司落地,
+      
+    
+    </summary>
+    
+    
+      <category term="Jenkins" scheme="http://yoursite.com/tags/Jenkins/"/>
+    
+      <category term="Mesos" scheme="http://yoursite.com/tags/Mesos/"/>
+    
+      <category term="Marathon" scheme="http://yoursite.com/tags/Marathon/"/>
+    
+      <category term="Docker" scheme="http://yoursite.com/tags/Docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hexo博客迁移</title>
+    <link href="http://yoursite.com/2017/10/09/hexo%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB/"/>
+    <id>http://yoursite.com/2017/10/09/hexo博客迁移/</id>
+    <published>2017-10-09T09:12:02.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>前段时间为了方便使用docker,将电脑系统由windows换成了ubuntu,加上宝宝出生,一堆事情待做,hexo博客迁移一直没做,今天终于下定决心做迁移,也会陆续将前段时间的一些总结更新到博客.</p><h2 id="迁移步骤"><a href="#迁移步骤" class="headerlink" title="迁移步骤"></a>迁移步骤</h2><ul><li>1.环境准备</li></ul><p>首先需要准备好新系统上的环境,主要是安装nodejs环境和npm环境.</p><p>下载地址:<a href="https://nodejs.org/en/download/" target="_blank" rel="external">https://nodejs.org/en/download/</a></p><p>tar.xz解压可以直接用<code>tar xvJf  ***.tar.xz</code></p><p>解压之后做软链接:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ln -s /home/xx/node/bin/node /usr/local/bin/node</div><div class="line">ln -s /home/xx/node/bin/npm /usr/local/bin/npm</div></pre></td></tr></table></figure></p><p><code>/home/xx/node/bin/node</code>和<code>/home/xx/node/bin/npm</code>分别是解压后的node和npm执行文件的绝对路径.</p><p>git环境ubuntu通常自带,不需要另外安装.</p><ul><li>2.拷贝原有博客目录</li></ul><p>需要拷贝的文件和文件夹包括:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">_config.yml</div><div class="line"> package.json</div><div class="line"> scaffolds/</div><div class="line"> source/</div><div class="line"> themes/</div></pre></td></tr></table></figure><p>将以上文件放置到新系统的某一目录下,如<code>blog</code>.</p><ul><li>3.安装hexo.</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo npm install hexo -g</div></pre></td></tr></table></figure><ul><li>4.安装hexo模块.</li></ul><p>进入blog目录,执行如下命令:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo npm install</div><div class="line"> sudo npm install hexo-deployer-git --save</div><div class="line"> sudo npm install hexo-generator-feed --save</div><div class="line"> sudo npm install hexo-generator-sitemap --save</div></pre></td></tr></table></figure><ul><li>5.测试.</li></ul><p>执行如下命令若不返回异常,迁移成功.</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo g</div></pre></td></tr></table></figure><p>若有异常,通常是有部分hexo模块未安装,按照提示用npm安装即可.</p><h2 id="写在后面"><a href="#写在后面" class="headerlink" title="写在后面"></a>写在后面</h2><p>以上迁移操作是在原有博客目录仍存在的情况,若目录不存在以上方法就不适用了,所以决定将博客目录同步到github上,以防丢失.需要同步的目录参考以上需要拷贝的目录即可.</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;写在前面&quot;&gt;&lt;a href=&quot;#写在前面&quot; class=&quot;headerlink&quot; title=&quot;写在前面&quot;&gt;&lt;/a&gt;写在前面&lt;/h2&gt;&lt;p&gt;前段时间为了方便使用docker,将电脑系统由windows换成了ubuntu,加上宝宝出生,一堆事情待做,hexo博客迁移
+      
+    
+    </summary>
+    
+    
+      <category term="hexo" scheme="http://yoursite.com/tags/hexo/"/>
+    
+      <category term="迁移" scheme="http://yoursite.com/tags/%E8%BF%81%E7%A7%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>selenium node镜像添加中文支持</title>
+    <link href="http://yoursite.com/2017/07/17/selenium-node%E9%95%9C%E5%83%8F%E6%B7%BB%E5%8A%A0%E4%B8%AD%E6%96%87%E6%94%AF%E6%8C%81/"/>
+    <id>http://yoursite.com/2017/07/17/selenium-node镜像添加中文支持/</id>
+    <published>2017-07-17T05:50:52.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><pre><code>FROM selenium/node-chrome-debugMAINTAINER angrytester &lt;thx_phila@yahoo.com&gt;USER rootRUN apt-get update \    &amp;&amp; apt-get -y install ttf-wqy-microhei ttf-wqy-zenhei \    &amp;&amp; apt-get cleanUSER seluser</code></pre><h2 id="需要注意的地方"><a href="#需要注意的地方" class="headerlink" title="需要注意的地方"></a>需要注意的地方</h2><blockquote><p>最后的USER seluser必须加上,否则VncServer起不来。</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Dockerfile&quot;&gt;&lt;a href=&quot;#Dockerfile&quot; class=&quot;headerlink&quot; title=&quot;Dockerfile&quot;&gt;&lt;/a&gt;Dockerfile&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;FROM selenium/node-chrome-debu
+      
+    
+    </summary>
+    
+    
+      <category term="selenium，docker" scheme="http://yoursite.com/tags/selenium%EF%BC%8Cdocker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>phantomJSDriver无法访问https的解决办法</title>
+    <link href="http://yoursite.com/2017/07/14/phantomJSDriver%E6%97%A0%E6%B3%95%E8%AE%BF%E9%97%AEhttps%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/"/>
+    <id>http://yoursite.com/2017/07/14/phantomJSDriver无法访问https的解决办法/</id>
+    <published>2017-07-14T00:50:02.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<pre><code>DesiredCapabilities dCaps = DesiredCapabilities.phantomjs();String[] phantomArgs = new String[] { &quot;--webdriver-loglevel=NONE&quot;,&quot; --ignore-ssl-errors=true&quot; };dCaps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, phantomArgs);dCaps.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + &quot;userAgent&quot;,&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11&quot;);dCaps.setJavascriptEnabled(true);dCaps.setCapability(&quot;takesScreenshot&quot;, true);</code></pre><blockquote><p>重点是<code>--ignore-ssl-errors=true</code></p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;pre&gt;&lt;code&gt;DesiredCapabilities dCaps = DesiredCapabilities.phantomjs();
+String[] phantomArgs = new String[] { &amp;quot;--webdriver-loglevel=NON
+      
+    
+    </summary>
+    
+    
+      <category term="phantomjs" scheme="http://yoursite.com/tags/phantomjs/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Windows上安装Docker</title>
+    <link href="http://yoursite.com/2017/05/05/Windows%E4%B8%8A%E5%AE%89%E8%A3%85Docker/"/>
+    <id>http://yoursite.com/2017/05/05/Windows上安装Docker/</id>
+    <published>2017-05-04T18:43:05.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="官方已有文档，why折腾"><a href="#官方已有文档，why折腾" class="headerlink" title="官方已有文档，why折腾"></a>官方已有文档，why折腾</h2><p>公司内网，与default配置有区别。</p><h2 id="Windows机器配置"><a href="#Windows机器配置" class="headerlink" title="Windows机器配置"></a>Windows机器配置</h2><blockquote><p>操作系统:64位Windows 7专业版</p><p>内存：4GB</p></blockquote><h2 id="安装Docker-Toolbox"><a href="#安装Docker-Toolbox" class="headerlink" title="安装Docker Toolbox"></a>安装Docker Toolbox</h2><blockquote><p>下载：ftp://ftp.cqrd.com/upload/DockerToolbox.exe</p><p>傻瓜式一步一步安装。</p><p>注意事项：安装路径尽量别有中文。</p></blockquote><h2 id="Docker启动配置"><a href="#Docker启动配置" class="headerlink" title="Docker启动配置"></a>Docker启动配置</h2><blockquote><p>将安装路径下的boot2docker.iso文件复制到C:\Users\你的用户.docker\machine\cache目录下。另外修改桌面上多出来的Docker Quickstart Terminal，右键属性-目标，修改前面的bash.exe为你之前安装的Git目录下的bash.exe。</p></blockquote><h2 id="使用Docker-Machine创建含Docker运行环境的虚拟机"><a href="#使用Docker-Machine创建含Docker运行环境的虚拟机" class="headerlink" title="使用Docker-Machine创建含Docker运行环境的虚拟机"></a>使用Docker-Machine创建含Docker运行环境的虚拟机</h2><p>参考如下脚本创建：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">docker-machine create -d virtualbox ^</div><div class="line">--virtualbox-host-dns-resolver ^</div><div class="line">--engine-env HTTP_PROXY=http://XXX.XX.XX.XX:XXXX ^</div><div class="line">--engine-env HTTPS_PROXY=http://XXX.XX.XX.XX:XXXX ^</div><div class="line">--engine-env NO_PROXY=xx.com,.xx.com ^</div><div class="line">--engine-opt bip=172.172.172.1/24 ^</div><div class="line">--engine-opt dns=xxx.xxx.xx.xx  ^</div><div class="line">--engine-registry-mirror https://xxx.xxx.xx ^</div><div class="line">--engine-insecure-registry xx.com ^</div><div class="line">--virtualbox-disk-size &quot;20000&quot; ^</div><div class="line">default</div></pre></td></tr></table></figure><blockquote><p>你也可以将以上脚本保存成bat文件，双击运行。</p></blockquote><h2 id="使用连接工具连接虚拟机"><a href="#使用连接工具连接虚拟机" class="headerlink" title="使用连接工具连接虚拟机"></a>使用连接工具连接虚拟机</h2><blockquote><p>前面的步骤实现了创建一个含Docker运行环境的虚拟机，你也可以通过virtualbox管理界面看到多了一个叫default的虚拟机。默认生成的defalt的ip为<code>192.168.99.100</code>,通过SSH连接工具你可以连接这个虚拟机，默认用户名密码为<code>docker/tcuser</code>。</p></blockquote><h2 id="关闭虚拟机和启动虚拟机"><a href="#关闭虚拟机和启动虚拟机" class="headerlink" title="关闭虚拟机和启动虚拟机"></a>关闭虚拟机和启动虚拟机</h2><blockquote><p>虚拟机的第一次启动会比较慢，之后每次启动都会比较快，和咱们平时创建虚拟机是一样的。</p></blockquote><h3 id="关闭虚拟机"><a href="#关闭虚拟机" class="headerlink" title="关闭虚拟机"></a>关闭虚拟机</h3><blockquote><p>运行如下bat命令：</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker-machine kill default</div></pre></td></tr></table></figure><h3 id="启动虚拟机"><a href="#启动虚拟机" class="headerlink" title="启动虚拟机"></a>启动虚拟机</h3><blockquote><p>方法一：</p><p>双击桌面上的Docker Quickstart Terminal。</p><p>方法二：</p><p>运行如下bat命令：</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker-machine start default</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;官方已有文档，why折腾&quot;&gt;&lt;a href=&quot;#官方已有文档，why折腾&quot; class=&quot;headerlink&quot; title=&quot;官方已有文档，why折腾&quot;&gt;&lt;/a&gt;官方已有文档，why折腾&lt;/h2&gt;&lt;p&gt;公司内网，与default配置有区别。&lt;/p&gt;
+&lt;h2 id
+      
+    
+    </summary>
+    
+    
+      <category term="Docker On Windows" scheme="http://yoursite.com/tags/Docker-On-Windows/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SSH Secure File Transfer的编码问题</title>
+    <link href="http://yoursite.com/2017/04/06/SSH-Secure-File-Transfer%E7%9A%84%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/"/>
+    <id>http://yoursite.com/2017/04/06/SSH-Secure-File-Transfer的编码问题/</id>
+    <published>2017-04-06T03:46:44.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在用SSH Secure File Transfer从linux服务器传输zip包到windows后，解压报文件已损坏。</p><h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>查Eidt-Settings-Global Settings-File Transfer-Mode</p><p>之前在找其他问题时手贱把mode设置成了ASCII,一般建议设置成Auto selec（自动选择），问题解决！</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;在用SSH Secure File Transfer从linux服务器传输zip包到windows后，解压报文件已损坏。&lt;/p&gt;
+&lt;h2 i
+      
+    
+    </summary>
+    
+    
+      <category term="SSH Secure File Transfer，编码" scheme="http://yoursite.com/tags/SSH-Secure-File-Transfer%EF%BC%8C%E7%BC%96%E7%A0%81/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>docker容器支持中文</title>
+    <link href="http://yoursite.com/2017/04/06/docker%E5%AE%B9%E5%99%A8%E6%94%AF%E6%8C%81%E4%B8%AD%E6%96%87/"/>
+    <id>http://yoursite.com/2017/04/06/docker容器支持中文/</id>
+    <published>2017-04-06T03:28:26.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在基底镜像centos:7基础上制作的镜像所起的容器中运行java程序，打出日志中文部分均显示为问号（?）</p><h2 id="解决方法（网络收集）"><a href="#解决方法（网络收集）" class="headerlink" title="解决方法（网络收集）"></a>解决方法（网络收集）</h2><p>在镜像Dockerfile中加上以下内容：</p><blockquote><p>RUN yum -y install kde-l10n-Chinese &amp;&amp; yum -y reinstall glibc-common &amp;&amp; localedef -c -f UTF-8 -i zh_CN zh_CN.utf8</p><p>ENV LC_ALL zh_CN.utf8</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;在基底镜像centos:7基础上制作的镜像所起的容器中运行java程序，打出日志中文部分均显示为问号（?）&lt;/p&gt;
+&lt;h2 id=&quot;解决方法
+      
+    
+    </summary>
+    
+    
+      <category term="docker，中文" scheme="http://yoursite.com/tags/docker%EF%BC%8C%E4%B8%AD%E6%96%87/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux下使用代理安装软件</title>
+    <link href="http://yoursite.com/2017/03/24/linux%E4%B8%8B%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6/"/>
+    <id>http://yoursite.com/2017/03/24/linux下使用代理安装软件/</id>
+    <published>2017-03-24T04:54:45.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h2><p><code>vi /etc/yum.conf</code></p><p>添加以下这行内容：http.proxy=<a href="http://127.0.0.1:8080" target="_blank" rel="external">http://127.0.0.1:8080</a></p><h2 id="apt-get"><a href="#apt-get" class="headerlink" title="apt-get"></a>apt-get</h2><p>新建一个文件任意命名如</p><p><em>conf</em></p><p>文件内容如下：</p><pre><code>Acquire::http::proxy &quot;http://127.0.0.1:8000/&quot;;Acquire::ftp::proxy &quot;ftp://127.0.0.1:8000/&quot;;Acquire::https::proxy &quot;https://127.0.0.1:8000/&quot;;</code></pre><p>下载时使用：</p><p><code>sudo apt-get -c conf</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;yum&quot;&gt;&lt;a href=&quot;#yum&quot; class=&quot;headerlink&quot; title=&quot;yum&quot;&gt;&lt;/a&gt;yum&lt;/h2&gt;&lt;p&gt;&lt;code&gt;vi /etc/yum.conf&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;添加以下这行内容：http.proxy=&lt;a href=&quot;
+      
+    
+    </summary>
+    
+    
+      <category term="linux，yum，apt-get" scheme="http://yoursite.com/tags/linux%EF%BC%8Cyum%EF%BC%8Capt-get/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率</title>
+    <link href="http://yoursite.com/2017/03/15/JaCoCo+Jenkins+Maven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/"/>
+    <id>http://yoursite.com/2017/03/15/JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率/</id>
+    <published>2017-03-15T00:43:35.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="功能测试覆盖率的意义"><a href="#功能测试覆盖率的意义" class="headerlink" title="功能测试覆盖率的意义"></a>功能测试覆盖率的意义</h2><p>首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！</p><p>数据指标情况只能辅助咱们决策或调整策略，与功能测试覆盖率类似，大家接触较多的可能是单元测试覆盖率，覆盖率够高，不一定代码质量就好，只是开发人员的质量信心能够有一些保障，覆盖率低，则证明有一些代码的分支甚至是没有经过单元测试的，则有必要检查我们比较关注的重要分支是否被测试覆盖，如果有，我觉得即使总体覆盖率低也是可以接受的。所以，这里的指标数据只是帮助我们及时调整策略。</p><p>与单元测试覆盖率类似，功能测试覆盖率的用途首先肯定不是用作各种考核。功能测试的对象也是应用代码，只是从更偏向于终端用户的视角运行应用，所以，从分析功能测试覆盖率可预见的几个好处至少包括：</p><ul><li><p>可能发现冗余无用代码</p></li><li><p>可能发现重要逻辑测试遗漏</p></li><li><p>可能根据覆盖率情况及时调整测试策略</p></li><li><p>可能根据高覆盖率为团队提供质量信心</p></li></ul><h2 id="JaCoCo的TCP-Socket-Server模式"><a href="#JaCoCo的TCP-Socket-Server模式" class="headerlink" title="JaCoCo的TCP Socket Server模式"></a>JaCoCo的TCP Socket Server模式</h2><p>JaCoCo主要通过Instrumentation机制来收集覆盖率信息，主要依赖的是Java Agent。有关于Java Agent，详细可参考：<a href="http://www.eclemma.org/jacoco/trunk/doc/agent.html。" target="_blank" rel="external">http://www.eclemma.org/jacoco/trunk/doc/agent.html。</a></p><p>有三种模式输出覆盖率数据，针对Tomcat应用，我们需要用到tcpserver这种模式，即通过暴露应用的一个端口，从这个端口可以获取到覆盖率数据。</p><h2 id="Tomcat设置"><a href="#Tomcat设置" class="headerlink" title="Tomcat设置"></a>Tomcat设置</h2><ul><li>首先需要下载jacocoagent.jar，下载地址：<a href="http://www.jacoco.org/jacoco/。" target="_blank" rel="external">http://www.jacoco.org/jacoco/。</a></li></ul><p>下载zip包之后解压获得jacocoagent.jar，将jar包放至tomcat的lib目录下。</p><ul><li>编辑catalina.bat（windows下、）或catalina.sh（linux），在JAVA_OPT中加入：</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-javaagent:%CATALINA_HOME%\lib\jacocoagent.jar=includes=*,output=tcpserver,port=2014,address=172.xx.x.xx</div></pre></td></tr></table></figure><blockquote><p>172.xx.x.xx为你的应用访问IP，2014为你自定义暴露的端口，用于外部获取覆盖率文件。</p></blockquote><p>至此，Tomcat就配置完成，在之后每次的Tomcat的启动过程中，就能够看到如下的启动日志：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">信息: Command line argument: -javaagent:D:\apache-tomcat-7.0.57\lib\jacocoagent.jar=includes=*,output=tcpserver,port=2014,address=172.xx.x.xx</div></pre></td></tr></table></figure><p>即通过172.xx.x.xx的2014端口，就能获取到覆盖率文件了，通常是jacoco.exec文件。</p><h2 id="Maven获取覆盖率文件"><a href="#Maven获取覆盖率文件" class="headerlink" title="Maven获取覆盖率文件"></a>Maven获取覆盖率文件</h2><p>JaCoCo提供了多种获取覆盖率文件的方式，常见的包括Ant和Maven。这里介绍了是通过Maven命令行的方式：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn org.jacoco:jacoco-maven-plugin:0.7.9:dump -Djacoco.address=172.xx.x.xx -Djacoco.reset=false -Djacoco.port=2014 -Djacoco.append=true</div></pre></td></tr></table></figure><blockquote><p>jacoco.address和jacoco.port为上面的Tomcat应用暴露的IP和端口，jacoco.reset和jacoco.append是指定在dump出覆盖率文件之后不做重置，在下一次获取覆盖率文件的时候直接追加。这对于多次启动应用，需要统计整体功能覆盖率的时候非常有用。</p></blockquote><p>更多可用参数详情可参考：</p><p><a href="http://www.eclemma.org/jacoco/trunk/doc/dump-mojo.html" target="_blank" rel="external">http://www.eclemma.org/jacoco/trunk/doc/dump-mojo.html</a></p><h2 id="Jenkins分析覆盖率文件"><a href="#Jenkins分析覆盖率文件" class="headerlink" title="Jenkins分析覆盖率文件"></a>Jenkins分析覆盖率文件</h2><p>通过Maven和Ant均可以分析覆盖率文件，甚至如果用过Sonar的同学知道，通过Sonar也可以分析JaCoCo的覆盖率文件。之所以这里用到Jenkins，是在持续交付盛行的情况下，通过Jenkins可以很方便的调度各个任务，更何况Jenkins提供了丰富的插件来支持各种构建任务。</p><p>Jenkins分析JaCoCo覆盖率文件，依赖的插件是：JaCoCo plugin（<a href="https://wiki.jenkins-ci.org/display/JENKINS/JaCoCo+Plugin）。" target="_blank" rel="external">https://wiki.jenkins-ci.org/display/JENKINS/JaCoCo+Plugin）。</a></p><p>安装完插件之后，在Jenkins的Job设置的构建后操作部分，可以选择：Record JaCoCo coverage Report，设置好jacoco.exec，类文件以及源文件的路径，就可以分析指定覆盖率文件生成报告了。</p><p>生成的覆盖率报告通过Job页面的Coverage Trend链接可以访问：</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/coverage.png" alt=""></p><p>可以看到整体覆盖率信息以及每个包的覆盖率信息：</p><p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/package.png" alt=""></p><p>当然也可以进入具体的类查看类的覆盖率信息。</p><h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>结合Docker技术，可以把对Tomcat的设置打到镜像中。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;功能测试覆盖率的意义&quot;&gt;&lt;a href=&quot;#功能测试覆盖率的意义&quot; class=&quot;headerlink&quot; title=&quot;功能测试覆盖率的意义&quot;&gt;&lt;/a&gt;功能测试覆盖率的意义&lt;/h2&gt;&lt;p&gt;首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！&lt;/p&gt;
+&lt;p&gt;数
+      
+    
+    </summary>
+    
+    
+      <category term="Jacoco" scheme="http://yoursite.com/tags/Jacoco/"/>
+    
+      <category term="Tomcat" scheme="http://yoursite.com/tags/Tomcat/"/>
+    
+      <category term="Jenkins" scheme="http://yoursite.com/tags/Jenkins/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>管道中通过shell验证测试环境是否可用</title>
+    <link href="http://yoursite.com/2017/03/14/%E7%AE%A1%E9%81%93%E4%B8%AD%E9%80%9A%E8%BF%87shell%E9%AA%8C%E8%AF%81%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8/"/>
+    <id>http://yoursite.com/2017/03/14/管道中通过shell验证测试环境是否可用/</id>
+    <published>2017-03-14T09:50:19.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h2><p>因为要将传统的持续交付管道改造成基于Docker的，所以需要切换原有的环境部署方式，相应的环境验证方式也需要更改。之前的方式Jenkins会把部署脚本和环境验证脚本当成一个shell脚本执行，做了切换之后，需要将之前的环境验证脚本改成执行通过shell执行，即只需要用linux环境就可以运行。由于对linux的shell不熟，才遇到这样一个大坑，特此记录。</p><p>参考脚本如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sh &quot; while [ `curl -o /dev/null -s -w %&#123;http_code&#125; http://xxx:xxx/test.html` != 200 ];do sleep 1;done;&quot;</div></pre></td></tr></table></figure><h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><p>while里面的判断左右的中括号都需要有一个空格，否则判断语句无效，因为这个问题纠结一下午…</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;坑&quot;&gt;&lt;a href=&quot;#坑&quot; class=&quot;headerlink&quot; title=&quot;坑&quot;&gt;&lt;/a&gt;坑&lt;/h2&gt;&lt;p&gt;因为要将传统的持续交付管道改造成基于Docker的，所以需要切换原有的环境部署方式，相应的环境验证方式也需要更改。之前的方式Jenkins会把部署脚
+      
+    
+    </summary>
+    
+    
+      <category term="pipeline" scheme="http://yoursite.com/tags/pipeline/"/>
+    
+      <category term="shell" scheme="http://yoursite.com/tags/shell/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>下载Docker容器里的文件的小技巧</title>
+    <link href="http://yoursite.com/2017/03/09/%E4%B8%8B%E8%BD%BDDocker%E5%AE%B9%E5%99%A8%E9%87%8C%E7%9A%84%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8F%E6%8A%80%E5%B7%A7/"/>
+    <id>http://yoursite.com/2017/03/09/下载Docker容器里的文件的小技巧/</id>
+    <published>2017-03-09T10:03:27.000Z</published>
+    <updated>2017-10-11T01:09:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前遇到有个项目丢失了war包，只有镜像和容器文件，但是现在需要变更数据库地址重新部署。更奇葩的是数据库配置不是在配置文件中，而是在一个Jar包中，需要把这个Jar包解压，然后修改解压后的某一个文件，然后重新打包上传，这就引入了这次的需求。</p><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>第一想法是在容器里开SSH服务，然后SSH进去，但是立马被自己否了，因为镜像只Expose了单端口，即应用访问的端口。如果需要其他端口服务，需要重新制作镜像并Expose其他端口，例如SSH就需要Expose22端口，相对比较麻烦。所以就找到以下这种比较傻但是有效的方式：</p><p>启动容器时候挂载容器里的一个空目录到本地一个目录，然后docker exec进入容器将需要下载的文件复制到容器里的那个空目录，退出容器，done！</p><p>简单方便！</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;之前遇到有个项目丢失了war包，只有镜像和容器文件，但是现在需要变更数据库地址重新部署。更奇葩的是数据库配置不是在配置文件中，而是在一个Ja
+      
+    
+    </summary>
+    
+    
+      <category term="Docker，下载" scheme="http://yoursite.com/tags/Docker%EF%BC%8C%E4%B8%8B%E8%BD%BD/"/>
+    
+  </entry>
+  
+</feed>

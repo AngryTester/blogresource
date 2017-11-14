@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Jacoco,Tomcat,Jenkins," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="AngryTester" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="功能测试覆盖率的意义首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！ 数据指标情况只能辅助咱们决策或调整策略，与功能测试覆盖率类似，大家接触较多的可能是单元测试覆盖率，覆盖率够高，不一定代码质量就好，只是开发人员的质量信心能够有一些保障，覆盖率低，则证明有一些代码的分支甚至是没有经过单元测试的，则有必要检查我们比较关注的重要分支是否被测试覆盖，如果有，我觉得即使总体覆盖率低也是可以接受的">
+<meta name="keywords" content="Jacoco,Tomcat,Jenkins">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率">
+<meta property="og:url" content="http://yoursite.com/2017/03/15/JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率/index.html">
+<meta property="og:site_name" content="AngryTester">
+<meta property="og:description" content="功能测试覆盖率的意义首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！ 数据指标情况只能辅助咱们决策或调整策略，与功能测试覆盖率类似，大家接触较多的可能是单元测试覆盖率，覆盖率够高，不一定代码质量就好，只是开发人员的质量信心能够有一些保障，覆盖率低，则证明有一些代码的分支甚至是没有经过单元测试的，则有必要检查我们比较关注的重要分支是否被测试覆盖，如果有，我觉得即使总体覆盖率低也是可以接受的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/coverage.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/package.png">
+<meta property="og:updated_time" content="2017-10-11T01:09:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率">
+<meta name="twitter:description" content="功能测试覆盖率的意义首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！ 数据指标情况只能辅助咱们决策或调整策略，与功能测试覆盖率类似，大家接触较多的可能是单元测试覆盖率，覆盖率够高，不一定代码质量就好，只是开发人员的质量信心能够有一些保障，覆盖率低，则证明有一些代码的分支甚至是没有经过单元测试的，则有必要检查我们比较关注的重要分支是否被测试覆盖，如果有，我觉得即使总体覆盖率低也是可以接受的">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/coverage.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/15/JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率/"/>
+
+
+
+
+
+  <title>JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率 | AngryTester</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">AngryTester</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">起点不论好坏，终点始终美好！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/15/JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="AngryTester">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="AngryTester">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-15T08:43:35+08:00">
+                2017-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="功能测试覆盖率的意义"><a href="#功能测试覆盖率的意义" class="headerlink" title="功能测试覆盖率的意义"></a>功能测试覆盖率的意义</h2><p>首先需要明确，将某些数据指标与KPI联系是毫无意义的！！！</p>
+<p>数据指标情况只能辅助咱们决策或调整策略，与功能测试覆盖率类似，大家接触较多的可能是单元测试覆盖率，覆盖率够高，不一定代码质量就好，只是开发人员的质量信心能够有一些保障，覆盖率低，则证明有一些代码的分支甚至是没有经过单元测试的，则有必要检查我们比较关注的重要分支是否被测试覆盖，如果有，我觉得即使总体覆盖率低也是可以接受的。所以，这里的指标数据只是帮助我们及时调整策略。</p>
+<p>与单元测试覆盖率类似，功能测试覆盖率的用途首先肯定不是用作各种考核。功能测试的对象也是应用代码，只是从更偏向于终端用户的视角运行应用，所以，从分析功能测试覆盖率可预见的几个好处至少包括：</p>
+<ul>
+<li><p>可能发现冗余无用代码</p>
+</li>
+<li><p>可能发现重要逻辑测试遗漏</p>
+</li>
+<li><p>可能根据覆盖率情况及时调整测试策略</p>
+</li>
+<li><p>可能根据高覆盖率为团队提供质量信心</p>
+</li>
+</ul>
+<h2 id="JaCoCo的TCP-Socket-Server模式"><a href="#JaCoCo的TCP-Socket-Server模式" class="headerlink" title="JaCoCo的TCP Socket Server模式"></a>JaCoCo的TCP Socket Server模式</h2><p>JaCoCo主要通过Instrumentation机制来收集覆盖率信息，主要依赖的是Java Agent。有关于Java Agent，详细可参考：<a href="http://www.eclemma.org/jacoco/trunk/doc/agent.html。" target="_blank" rel="external">http://www.eclemma.org/jacoco/trunk/doc/agent.html。</a></p>
+<p>有三种模式输出覆盖率数据，针对Tomcat应用，我们需要用到tcpserver这种模式，即通过暴露应用的一个端口，从这个端口可以获取到覆盖率数据。</p>
+<h2 id="Tomcat设置"><a href="#Tomcat设置" class="headerlink" title="Tomcat设置"></a>Tomcat设置</h2><ul>
+<li>首先需要下载jacocoagent.jar，下载地址：<a href="http://www.jacoco.org/jacoco/。" target="_blank" rel="external">http://www.jacoco.org/jacoco/。</a></li>
+</ul>
+<p>下载zip包之后解压获得jacocoagent.jar，将jar包放至tomcat的lib目录下。</p>
+<ul>
+<li>编辑catalina.bat（windows下、）或catalina.sh（linux），在JAVA_OPT中加入：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-javaagent:%CATALINA_HOME%\lib\jacocoagent.jar=includes=*,output=tcpserver,port=2014,address=172.xx.x.xx</div></pre></td></tr></table></figure>
+<blockquote>
+<p>172.xx.x.xx为你的应用访问IP，2014为你自定义暴露的端口，用于外部获取覆盖率文件。</p>
+</blockquote>
+<p>至此，Tomcat就配置完成，在之后每次的Tomcat的启动过程中，就能够看到如下的启动日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">信息: Command line argument: -javaagent:D:\apache-tomcat-7.0.57\lib\jacocoagent.jar=includes=*,output=tcpserver,port=2014,address=172.xx.x.xx</div></pre></td></tr></table></figure>
+<p>即通过172.xx.x.xx的2014端口，就能获取到覆盖率文件了，通常是jacoco.exec文件。</p>
+<h2 id="Maven获取覆盖率文件"><a href="#Maven获取覆盖率文件" class="headerlink" title="Maven获取覆盖率文件"></a>Maven获取覆盖率文件</h2><p>JaCoCo提供了多种获取覆盖率文件的方式，常见的包括Ant和Maven。这里介绍了是通过Maven命令行的方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn org.jacoco:jacoco-maven-plugin:0.7.9:dump -Djacoco.address=172.xx.x.xx -Djacoco.reset=false -Djacoco.port=2014 -Djacoco.append=true</div></pre></td></tr></table></figure>
+<blockquote>
+<p>jacoco.address和jacoco.port为上面的Tomcat应用暴露的IP和端口，jacoco.reset和jacoco.append是指定在dump出覆盖率文件之后不做重置，在下一次获取覆盖率文件的时候直接追加。这对于多次启动应用，需要统计整体功能覆盖率的时候非常有用。</p>
+</blockquote>
+<p>更多可用参数详情可参考：</p>
+<p><a href="http://www.eclemma.org/jacoco/trunk/doc/dump-mojo.html" target="_blank" rel="external">http://www.eclemma.org/jacoco/trunk/doc/dump-mojo.html</a></p>
+<h2 id="Jenkins分析覆盖率文件"><a href="#Jenkins分析覆盖率文件" class="headerlink" title="Jenkins分析覆盖率文件"></a>Jenkins分析覆盖率文件</h2><p>通过Maven和Ant均可以分析覆盖率文件，甚至如果用过Sonar的同学知道，通过Sonar也可以分析JaCoCo的覆盖率文件。之所以这里用到Jenkins，是在持续交付盛行的情况下，通过Jenkins可以很方便的调度各个任务，更何况Jenkins提供了丰富的插件来支持各种构建任务。</p>
+<p>Jenkins分析JaCoCo覆盖率文件，依赖的插件是：JaCoCo plugin（<a href="https://wiki.jenkins-ci.org/display/JENKINS/JaCoCo+Plugin）。" target="_blank" rel="external">https://wiki.jenkins-ci.org/display/JENKINS/JaCoCo+Plugin）。</a></p>
+<p>安装完插件之后，在Jenkins的Job设置的构建后操作部分，可以选择：Record JaCoCo coverage Report，设置好jacoco.exec，类文件以及源文件的路径，就可以分析指定覆盖率文件生成报告了。</p>
+<p>生成的覆盖率报告通过Job页面的Coverage Trend链接可以访问：</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/coverage.png" alt=""></p>
+<p>可以看到整体覆盖率信息以及每个包的覆盖率信息：</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/JaCoCo%2BJenkins%2BMaven%E8%8E%B7%E5%8F%96Tomcat%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87/package.png" alt=""></p>
+<p>当然也可以进入具体的类查看类的覆盖率信息。</p>
+<h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>结合Docker技术，可以把对Tomcat的设置打到镜像中。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jacoco/" rel="tag"># Jacoco</a>
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+            <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/14/管道中通过shell验证测试环境是否可用/" rel="next" title="管道中通过shell验证测试环境是否可用">
+                <i class="fa fa-chevron-left"></i> 管道中通过shell验证测试环境是否可用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/24/linux下使用代理安装软件/" rel="prev" title="linux下使用代理安装软件">
+                linux下使用代理安装软件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">AngryTester</p>
+              <p class="site-description motion-element" itemprop="description">起点不论好坏，终点始终美好！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#功能测试覆盖率的意义"><span class="nav-number">1.</span> <span class="nav-text">功能测试覆盖率的意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JaCoCo的TCP-Socket-Server模式"><span class="nav-number">2.</span> <span class="nav-text">JaCoCo的TCP Socket Server模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tomcat设置"><span class="nav-number">3.</span> <span class="nav-text">Tomcat设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Maven获取覆盖率文件"><span class="nav-number">4.</span> <span class="nav-text">Maven获取覆盖率文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins分析覆盖率文件"><span class="nav-number">5.</span> <span class="nav-text">Jenkins分析覆盖率文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续"><span class="nav-number">6.</span> <span class="nav-text">后续</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">AngryTester</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

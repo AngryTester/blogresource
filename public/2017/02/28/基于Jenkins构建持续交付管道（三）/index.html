@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Jenkins,持续交付,Pipeline," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="AngryTester" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="前言上一章中已经介绍了如何基于Jenkins配置一个独立的Job，即完成了交付流程中单个节点的实现，持续交付管道需要将交付流程中的各个节点串起来，再加上适当的反馈。本章将介绍如何将各个独立Job进行串联。 各个交付节点的实现结合上一章的内容，交付流程中的各个节点其实就对应到一个一个的Job。以典型的Java项目为例，如果使用Maven进行构建，可能涉及的节点可能有：编译打包、单元测试、静态扫描、测">
+<meta name="keywords" content="Jenkins,持续交付,Pipeline">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Jenkins构建持续交付管道（三）">
+<meta property="og:url" content="http://yoursite.com/2017/02/28/基于Jenkins构建持续交付管道（三）/index.html">
+<meta property="og:site_name" content="AngryTester">
+<meta property="og:description" content="前言上一章中已经介绍了如何基于Jenkins配置一个独立的Job，即完成了交付流程中单个节点的实现，持续交付管道需要将交付流程中的各个节点串起来，再加上适当的反馈。本章将介绍如何将各个独立Job进行串联。 各个交付节点的实现结合上一章的内容，交付流程中的各个节点其实就对应到一个一个的Job。以典型的Java项目为例，如果使用Maven进行构建，可能涉及的节点可能有：编译打包、单元测试、静态扫描、测">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/6.png">
+<meta property="og:updated_time" content="2017-10-11T01:09:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Jenkins构建持续交付管道（三）">
+<meta name="twitter:description" content="前言上一章中已经介绍了如何基于Jenkins配置一个独立的Job，即完成了交付流程中单个节点的实现，持续交付管道需要将交付流程中的各个节点串起来，再加上适当的反馈。本章将介绍如何将各个独立Job进行串联。 各个交付节点的实现结合上一章的内容，交付流程中的各个节点其实就对应到一个一个的Job。以典型的Java项目为例，如果使用Maven进行构建，可能涉及的节点可能有：编译打包、单元测试、静态扫描、测">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/28/基于Jenkins构建持续交付管道（三）/"/>
+
+
+
+
+
+  <title>基于Jenkins构建持续交付管道（三） | AngryTester</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">AngryTester</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">起点不论好坏，终点始终美好！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/28/基于Jenkins构建持续交付管道（三）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="AngryTester">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="AngryTester">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于Jenkins构建持续交付管道（三）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-28T08:57:41+08:00">
+                2017-02-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一章中已经介绍了如何基于Jenkins配置一个独立的Job，即完成了交付流程中单个节点的实现，持续交付管道需要将交付流程中的各个节点串起来，再加上适当的反馈。本章将介绍如何将各个独立Job进行串联。</p>
+<h2 id="各个交付节点的实现"><a href="#各个交付节点的实现" class="headerlink" title="各个交付节点的实现"></a>各个交付节点的实现</h2><p>结合上一章的内容，交付流程中的各个节点其实就对应到一个一个的Job。以典型的Java项目为例，如果使用Maven进行构建，可能涉及的节点可能有：编译打包、单元测试、静态扫描、测试部署、功能测试等。分别对应的Maven命令如下：</p>
+<ul>
+<li><p>编译打包(跳过单元测试)：mvn clean install -Dmaven.test.skip=true</p>
+</li>
+<li><p>单元测试：mvn clean test</p>
+</li>
+<li><p>静态扫描：mvn sonar:sonar</p>
+</li>
+</ul>
+<h3 id="测试环境部署"><a href="#测试环境部署" class="headerlink" title="测试环境部署"></a>测试环境部署</h3><p>测试环境部署与其他交付节点有所不同，因此涉及与测试服务器的交互，所以测试环境部署任务需要分成两步。第一步是打包，第二步才是部署。但是庆幸的是Jenkins提供了相关插件，让你可以在一个Job中完成整个部署操作。</p>
+<p>打包部分可以参考上面的内容，即mvn clean install即可完成。但是之后对测试服务器的操作得依赖另一个插件：publish over ssh。</p>
+<p>在插件安装完成之后，需要在Jenkins中对测试服务器进行配置，然后在Job中才可以选择使用。具体操作是：<code>系统管理&gt;系统设置&gt;Publish over SSH</code>。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/1.png" alt=""></p>
+<p>点击“增加”按钮，参考以下内容输入：</p>
+<ul>
+<li><p>Name：定义服务器名称，可自定义</p>
+</li>
+<li><p>Hostname:服务器IP</p>
+</li>
+<li><p>Username:登录用户名</p>
+</li>
+<li><p>Remote Directory：默认SSH进入的路径</p>
+</li>
+</ul>
+<p>点击高级，勾选“Use password authentication, or use a different key”，</p>
+<p>-Passphrase / Password：登录密码</p>
+<p>点击Test Configuration可以测试配置，如果返回“连接成功”，则代表配置正确。</p>
+<p>再进入Job设置，在Post Step下选择“Send file or execute commands over SSH”。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/2.png" alt=""></p>
+<p>参考以下内容输入：</p>
+<ul>
+<li><p>Name：下拉选择系统设置中配置的服务器</p>
+</li>
+<li><p>Source files：需要传输的文件，相对路径。如工作空间下有一个文件夹aa，需要传输aa下面的bb.war，则这里需要输入aa/bb.war</p>
+</li>
+<li><p>Remove prefix：去掉上一条内容前缀，即如果这里输入aa/，这内容变为bb.war。</p>
+</li>
+<li><p>Remote directory：文件发送的远程路径，与系统设置中的远程路径组合成完整路径。例如这里输入opt/app，加上系统设置中的/，则完整远程路径为/opt/app</p>
+</li>
+<li><p>Exec command：需要执行的命令。以上已经完成了文件的传输，一般是war包，即需要部署的文件已经发送至测试服务器了。还需要在测试服务器上执行一段shell，例如停止应用服务器，传输war包等。就可以在这里配置。</p>
+</li>
+</ul>
+<p>通过以上配置，就可以完成测试环境的部署了。</p>
+<h2 id="各个交付节点的串联"><a href="#各个交付节点的串联" class="headerlink" title="各个交付节点的串联"></a>各个交付节点的串联</h2><p>Jenkins的交付节点串联依赖另一个插件-build pipeline plugin。在安装完这个插件之后，进入Job设置，在“增加构建后操作”下选择“Trigger parameterized build on other projects”：</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/3.png" alt=""></p>
+<ul>
+<li><p>Projects to build:即当前job构建结束之后要运行的Job名称。</p>
+</li>
+<li><p>Trigger when build is：当前Job构建状态为XX时才触发。</p>
+</li>
+<li><p>Trigger build without parameters：不需要指定参数构建，如果不传参数，这个必须勾选上，否则串联会有问题。</p>
+</li>
+<li><p>Add Parameters：可以指定参数。这里重点需要说明的是SVN Revision参数，如果你需要将前一个Job的SVN版本号传给下一个Job，就可以把这个参数加上。重点解决的是前后如果对同一份代码进行编译和单元测试，可能造成前后版本不一致（编译过程中有人提交）。</p>
+</li>
+</ul>
+<p>这样串联之后，在当前Job执行完之后就会自动触发下一个Job执行了。</p>
+<h2 id="创建管道视图"><a href="#创建管道视图" class="headerlink" title="创建管道视图"></a>创建管道视图</h2><p>上面的步骤实际已经将各个Job串联成一条管道了，但是缺乏一个统一视图。可以通过添加build pipeline视图来创建一个管道视图。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/4.png" alt=""></p>
+<p>重点需要配置的是初始Job。其他配置可以根据需要选择。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/5.png" alt=""></p>
+<p>配置之后，就能看到一个管道的视图了，点击Run，就会自动运行整条管道了。</p>
+<p><img src="https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%B8%89%EF%BC%89/6.png" alt=""></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>以上是管道的主要实现，在实际应用过程中，可能还有一些细节需要优化，例如反馈机制（邮件通知），触发规则等等。可根据各个项目的不同需求自行定制。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          
+            <a href="/tags/持续交付/" rel="tag"># 持续交付</a>
+          
+            <a href="/tags/Pipeline/" rel="tag"># Pipeline</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/27/基于Jenkins构建持续交付管道（二）/" rel="next" title="基于Jenkins构建持续交付管道（二）">
+                <i class="fa fa-chevron-left"></i> 基于Jenkins构建持续交付管道（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/28/Jenkins通过正则获取指定日志并邮件发送/" rel="prev" title="Jenkins通过正则获取指定日志并邮件发送">
+                Jenkins通过正则获取指定日志并邮件发送 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">AngryTester</p>
+              <p class="site-description motion-element" itemprop="description">起点不论好坏，终点始终美好！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各个交付节点的实现"><span class="nav-number">2.</span> <span class="nav-text">各个交付节点的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试环境部署"><span class="nav-number">2.1.</span> <span class="nav-text">测试环境部署</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各个交付节点的串联"><span class="nav-number">3.</span> <span class="nav-text">各个交付节点的串联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建管道视图"><span class="nav-number">4.</span> <span class="nav-text">创建管道视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">AngryTester</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

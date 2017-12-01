@@ -16,7 +16,7 @@ tags: [Docker On Windows]
 
 ## 安装Docker Toolbox
 
-> 下载：ftp://ftp.cqrd.com/upload/DockerToolbox.exe
+> 下载：https://download.docker.com/win/stable/DockerToolbox.exe
 
 > 傻瓜式一步一步安装。
 

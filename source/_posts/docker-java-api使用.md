@@ -22,6 +22,17 @@ systemctl restart docker
 
 ### 第二步 使用java api远程调用 
 
+> 加入依赖：
+
+```xml
+ <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <!-- use latest version https://github.com/docker-java/docker-java/releases -->
+            <version>3.0.14</version>
+        </dependency>
+```
+
 ```java
  public static void main(String[] args) {
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
@@ -47,3 +58,5 @@ systemctl restart docker
     }
 ```
 
+
+参考：https://github.com/amihaiemil/docker-java-api/wiki

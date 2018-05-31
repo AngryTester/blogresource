@@ -15,69 +15,70 @@ cucumber不需多说，BDD工具，目前被我们用于实例化接口文档。
 - `pom.xml`文件中添加依赖：
 
 ```xml
+    <properties>
         <cucumber.version>1.2.5</cucumber.version>
         <cucumber-runner.version>1.3.3</cucumber-runner.version>
         <junit.version>4.12</junit.version>
-
-  <!--  cucumber -->
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+    </properties>
+    <!--  cucumber -->
+    <dependency>
+        <groupId>info.cukes</groupId>
+        <artifactId>cucumber-java</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>info.cukes</groupId>
+        <artifactId>cucumber-junit</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
 ```
 
 - 添加插件配置
 
 ```xml
   <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
-                <configuration>
-                    <skip>${skipSurefire}</skip>
-                    <excludes>
-                        <exclude>**/RunBDDTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
-                <configuration>
-                    <includes>
-                        <include>**/RunBDDTest.java</include>
-                    </includes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <configuration>
+            <skip>${skipSurefire}</skip>
+            <excludes>
+                <exclude>**/RunBDDTest.java</exclude>
+            </excludes>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.19.1</version>
+        <configuration>
+            <includes>
+                <include>**/RunBDDTest.java</include>
+            </includes>
+        </configuration>
+        <executions>
+            <execution>
+                <id>integration-test</id>
+                <goals>
+                    <goal>integration-test</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>verify</id>
+                <goals>
+                    <goal>verify</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
 ```
 ### 实现
 
@@ -162,7 +163,7 @@ gradle cucumber
 ```
 ## 后记
 
-- 建议ide使用idea，插件更强大，调试更方便。
+- 建议ide使用idea，插件更强大，调试更方便
 
 - eclipse插件在结合rest-assured使用时可能会出现依赖冲突，可加入如下依赖解决：
 
@@ -174,4 +175,4 @@ gradle cucumber
     </dependency>
 ```
 
-- 建议BDD测试代码与单元测试代码放在一起，可以和项目代码一起做版本控制。
+- 建议BDD测试代码与单元测试代码放在一起，可以和项目代码一起做版本控制

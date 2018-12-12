@@ -1,7 +1,7 @@
 ---
 title: JaCoCo+Jenkins+Maven获取Tomcat应用功能测试覆盖率
 date: 2017-03-15 08:43:35
-tags: [Jacoco,Tomcat,Jenkins]
+tags: [Jacoco,精准测试]
 ---
 
 ## 功能测试覆盖率的意义

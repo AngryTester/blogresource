@@ -1,7 +1,7 @@
 ---
 title: Windows上安装Docker
 date: 2017-05-05 02:43:05
-tags: [Docker On Windows]
+tags: [Docker]
 ---
 
 ## 官方已有文档，why折腾

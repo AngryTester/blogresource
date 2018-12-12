@@ -1,7 +1,7 @@
 ---
 title: 管道中通过shell验证测试环境是否可用
 date: 2017-03-14 17:50:19
-tags: [pipeline,shell]
+tags: [Pipeline,Shell]
 ---
 
 ## 坑

@@ -1,7 +1,7 @@
 ---
 title: SSH Secure File Transfer的编码问题
 date: 2017-04-06 11:46:44
-tags: [SSH Secure File Transfer,编码]
+tags: [SSH Secure File Transfer]
 ---
 
 ## 问题

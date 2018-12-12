@@ -1,7 +1,7 @@
 ---
 title: selenium node镜像添加中文支持
 date: 2017-07-17 13:50:52
-tags: [selenium,docker]
+tags: [Docker]
 ---
 
 ## Dockerfile

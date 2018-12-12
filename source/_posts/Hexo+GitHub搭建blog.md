@@ -1,7 +1,7 @@
 ﻿---
 title: Hexo+GitHub搭建blog
 date: 2017-02-07 19:58:48
-tags: [Hexo,GitHub Page,Windows]
+tags: [Hexo,GitHub Page]
 ---
 
 Hexo和GitHub就不过多介绍了，网上同类教程也不少，只是因为公司有代理，记录一下搭建过程中的注意点。机器为64位Win7。

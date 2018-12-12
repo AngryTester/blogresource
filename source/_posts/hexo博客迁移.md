@@ -1,7 +1,7 @@
 ---
 title: hexo博客迁移
 date: 2017-10-09 17:12:02
-tags: [hexo,迁移]
+tags: [Hexo]
 ---
 
 ## 写在前面

@@ -1,7 +1,7 @@
 ---
 title: Jenkins通过正则获取指定日志并邮件发送
 date: 2017-02-28 10:31:39
-tags: [Jenkins,日志,邮件]
+tags: [Jenkins]
 ---
 
 ## 使用场景

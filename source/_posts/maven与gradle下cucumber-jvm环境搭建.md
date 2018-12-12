@@ -1,7 +1,7 @@
 ---
 title: maven与gradle下cucumber-jvm环境搭建
 date: 2018-05-31 08:46:04
-tags: [cucumber,gradle,maven]
+tags: [Cucumber,Gradle,Maven]
 ---
 
 ## 前言

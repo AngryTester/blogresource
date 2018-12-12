@@ -1,7 +1,7 @@
 ---
 title: RobotFramework接口测试设置代理
 date: 2018-12-12 19:08:10
-tags: [RobotFramework,自动化,代理]
+tags: [RobotFramework,Proxy]
 ---
 
 ## 使用场景

@@ -1,7 +1,7 @@
 ---
 title: Maven构建反应堆及在Jenkins中的用法
 date: 2017-02-09 08:15:52
-tags: [Maven,加速构建,Jenkins]
+tags: [Maven,持续交付,Jenkins]
 ---
 
 ## 问题

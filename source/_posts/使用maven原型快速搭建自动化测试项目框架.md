@@ -1,7 +1,7 @@
 ---
 title: 使用maven原型快速搭建自动化测试项目框架
 date: 2017-11-09 14:58:16
-tags: [maven,archetype]
+tags: [Maven]
 ---
 
 ## 使用场景

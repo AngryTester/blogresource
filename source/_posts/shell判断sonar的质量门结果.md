@@ -1,7 +1,7 @@
 ---
 title: shell判断sonar的质量门结果
 date: 2017-10-12 15:08:03
-tags: [sonar,quliaty gate]
+tags: [Shell,Sonar]
 ---
 
 ## 使用场景

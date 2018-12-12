@@ -1,7 +1,7 @@
 ---
 title: Maven多模块版本管理
 date: 2017-02-09 08:13:01
-tags: [Maven,版本管理]
+tags: [Maven]
 ---
 
 ## 问题

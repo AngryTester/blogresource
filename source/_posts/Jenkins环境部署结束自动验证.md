@@ -1,7 +1,7 @@
 ---
 title: Jenkins环境部署结束自动验证
 date: 2017-02-28 10:49:49
-tags: [环境验证]
+tags: [Shell]
 ---
 
 ## 遇到问题

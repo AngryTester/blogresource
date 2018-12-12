@@ -1,7 +1,7 @@
 ---
 title: TestNG实现失败重试功能
 date: 2017-11-07 15:21:49
-tags: [TestNg,Retry]
+tags: [TestNg]
 ---
 
 ## 使用场景

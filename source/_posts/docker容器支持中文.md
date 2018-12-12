@@ -1,7 +1,7 @@
 ---
 title: docker容器支持中文
 date: 2017-04-06 11:28:26
-tags: [docker,中文]
+tags: [Docker]
 ---
 
 ## 问题

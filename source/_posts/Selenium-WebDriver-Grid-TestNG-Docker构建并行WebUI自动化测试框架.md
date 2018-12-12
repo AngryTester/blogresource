@@ -1,7 +1,7 @@
 ---
 title: Selenium WebDriver+Grid+TestNG+Docker构建并行WebUI自动化测试框架
 date: 2017-10-12 09:46:16
-tags:  [Grid,并行自动化,TestNG]
+tags:  [Selenium,TestNG]
 ---
 
 ## 前言

@@ -1,7 +1,7 @@
 ---
 title: docker的启动参数配置
 date: 2018-05-17 08:57:16
-tags: [docker,daemon.json]
+tags: [Docker]
 ---
 
 以centos系统为例，启动参数涉及的文件主要为：`/etc/docker/daemon.json`和`/etc/systemd/system/docker.service.d/http-proxy.conf`.

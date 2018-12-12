@@ -1,7 +1,7 @@
 ---
 title: Ansible对Windows系统的支持
 date: 2017-02-08 10:11:48
-tags: [Ansible,Windows]
+tags: [Ansible]
 toc: true
 comment: true
 ---

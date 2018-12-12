@@ -1,7 +1,7 @@
 ---
 title: Jenkins+Ansible完成Windows服务器上的tomcat应用部署
 date: 2017-02-13 14:22:47
-tags: [Jenkins,Ansible,Tomcat]
+tags: [Jenkins,Ansible]
 ---
 
 ## Jenkins

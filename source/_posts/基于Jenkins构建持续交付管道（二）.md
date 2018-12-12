@@ -1,7 +1,7 @@
 ---
 title: 基于Jenkins构建持续交付管道（二）
 date: 2017-02-27 16:16:33
-tags: [Jenkins,Pipeline]
+tags: [Jenkins,Pipeline,持续交付]
 ---
 
 ## 前言

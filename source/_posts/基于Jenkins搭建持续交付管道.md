@@ -1,7 +1,7 @@
 ---
 title: 基于Jenkins搭建持续交付管道
 date: 2017-02-09 08:42:21
-tags: [Jenkins,持续交付管道]
+tags: [Jenkins,持续交付]
 ---
 
 

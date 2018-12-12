@@ -1,7 +1,7 @@
 ---
 title: 修改tomcat镜像并重新上传
 date: 2017-02-20 17:58:14
-tags: [docker,tomcat]
+tags: [Docker]
 ---
 
 ## 使用场景

@@ -1,7 +1,7 @@
 ---
 title: linux下使用代理安装软件
 date: 2017-03-24 12:54:45
-tags: [linux,yum,apt-get]
+tags: [Linux,Proxy]
 ---
 
 ## yum

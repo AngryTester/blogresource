@@ -18,7 +18,7 @@ tags: [Jenkins,Ansible,Tomcat]
 ## Ansible
 
 >Ansible完成war包发送和tomcat的启停。
-
+<!-- more -->
 ### Ansible脚本参考
 
 ![](https://raw.githubusercontent.com/AngryTester/blog/master/d.jpg)

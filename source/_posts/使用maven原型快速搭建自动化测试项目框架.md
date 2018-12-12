@@ -1,7 +1,7 @@
 ---
 title: 使用maven原型快速搭建自动化测试项目框架
 date: 2017-11-09 14:58:16
-tags: [maven，archetype]
+tags: [maven,archetype]
 ---
 
 ## 使用场景
@@ -18,6 +18,7 @@ tags: [maven，archetype]
 mvn archetype:create-from-project
 ```
 
+<!-- more -->
 就会在工程目录下的target/generated-sources/archetype生成原型文件．
 
 -　修改上一步生成的原型文件中的`pom.xml`，可修改原型名称，加入私服地址等，然后执行如下命令将原型工程打包上传至私服：

@@ -20,5 +20,5 @@ do
     STATUS_CODE=`curl -o /dev/null -s -w %{http_code} http://localhost:8080/test.html`
 done
 ```
-
+<!-- more -->
 其中http://localhost:8080/test.html即为你需要验证的测试环境地址，这样一直到环境访问返回200，否则shell会一直执行等待。

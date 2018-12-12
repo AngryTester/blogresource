@@ -18,6 +18,7 @@ tags: [hexo,迁移]
 
 tar.xz解压可以直接用`tar xvJf  ***.tar.xz`
 
+<!-- more -->
 解压之后做软链接:
 ```
 ln -s /home/xx/node/bin/node /usr/local/bin/node

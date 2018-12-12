@@ -1,7 +1,7 @@
 ---
 title: maven与gradle下cucumber-jvm环境搭建
 date: 2018-05-31 08:46:04
-tags: [cucumber，gradle，maven]
+tags: [cucumber,gradle,maven]
 ---
 
 ## 前言
@@ -13,7 +13,7 @@ cucumber不需多说，BDD工具，目前被我们用于实例化接口文档。
 ### 配置
 
 - `pom.xml`文件中添加依赖：
-
+<!-- more -->
 ```xml
     <properties>
         <cucumber.version>1.2.5</cucumber.version>

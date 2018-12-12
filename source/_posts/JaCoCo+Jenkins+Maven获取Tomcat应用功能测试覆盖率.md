@@ -18,6 +18,7 @@ tags: [Jacoco,Tomcat,Jenkins]
 
 - 可能根据覆盖率情况及时调整测试策略
 
+<!-- more -->
 - 可能根据高覆盖率为团队提供质量信心
 
 ## JaCoCo的TCP Socket Server模式

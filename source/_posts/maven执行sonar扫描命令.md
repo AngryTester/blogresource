@@ -1,7 +1,7 @@
 ---
 title: Maven执行Sonar扫描命令
 date: 2017-11-02 14:57:24
-tags: [Maven，Sonar]
+tags: [Maven,Sonar]
 ---
 
 需要通过jacoco统计单元测试覆盖率，不需要对项目做配置，直接运行如下命令即可：

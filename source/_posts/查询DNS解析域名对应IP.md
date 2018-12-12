@@ -1,7 +1,7 @@
 ---
 title: 查询DNS解析域名对应IP
 date: 2017-11-08 08:52:32
-tags: [IP，DNS]
+tags: [IP,DNS]
 ---
 
 

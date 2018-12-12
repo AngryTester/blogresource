@@ -18,7 +18,7 @@ Jenkins虽然有质量门插件,但是存在的问题是通过命令行触发静
  CI_PROJECT_NAME=$2
 
 #执行sonar
-
+<!-- more -->
 mvn sonar:sonar -Dsonar.host.url=$sonar_url
 
 #获取projectKey

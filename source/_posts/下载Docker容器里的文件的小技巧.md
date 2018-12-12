@@ -1,7 +1,7 @@
 ---
 title: 下载Docker容器里的文件的小技巧
 date: 2017-03-09 18:03:27
-tags: [Docker，下载]
+tags: [Docker,下载]
 ---
 
 ## 前言

@@ -18,6 +18,7 @@ tags: [Docker On Windows]
 
 > 下载：https://download.docker.com/win/stable/DockerToolbox.exe
 
+<!-- more -->
 > 傻瓜式一步一步安装。
 
 > 注意事项：安装路径尽量别有中文。

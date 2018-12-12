@@ -18,7 +18,7 @@ Hexo和GitHub就不过多介绍了，网上同类教程也不少，只是因为�
 >下载地址：https://nodejs.org/dist/v6.9.5/node-v6.9.5-x64.msi
 
 ### 3. 配置Git
-
+<!-- more -->
 >因为后面Hexo初始化以及后面Hexo发布都会用到Git，所以如果访问GitHub需要代理，需要提前配置。
 
 ``` bash

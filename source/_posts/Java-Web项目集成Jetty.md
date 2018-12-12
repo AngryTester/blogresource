@@ -18,6 +18,7 @@ tags: [Jetty]
 
 - Jetty运行应用时，通过`servletContext.getRealPath("/")`相比其他中间件获取到的路径会少一个`/`，导致某些资源访问可能存在问题。
 
+<!-- more -->
 - 出现JSP页面无法编译的报错，需加入如下依赖：
 
 ```xml

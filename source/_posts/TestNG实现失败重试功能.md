@@ -1,7 +1,7 @@
 ---
 title: TestNG实现失败重试功能
 date: 2017-11-07 15:21:49
-tags: [TestNg，Retry]
+tags: [TestNg,Retry]
 ---
 
 ## 使用场景
@@ -18,6 +18,7 @@ tags: [TestNg，Retry]
 
 - 1.TestNG的版本问题
 
+<!-- more -->
 > 这个前面已经说了，不再赘述．同时运行环境必须升级成JDK8.
 
 - 2.关键是自定义监听实现`IRetryAnalyzer`接口:

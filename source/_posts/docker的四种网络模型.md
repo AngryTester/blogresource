@@ -1,7 +1,7 @@
 ---
 title: docker的四种网络模型
 date: 2018-05-17 08:43:53
-tags: [docker，网络]
+tags: [docker,网络]
 ---
 
 ## docker自动创建的网络
@@ -18,7 +18,7 @@ docker0   Link encap:以太网  硬件地址 02:42:a7:b0:df:c3
           碰撞:0 发送队列长度:0 
           接收字节:536 (536.0 B)  发送字节:6864 (6.8 KB)
 ```
-
+<!-- more -->
 默认的`inet`应该是`172.17.0.1`，我这里是因为修改了docker的启动参数`bip`，可参考[docker的启动参数配置]().
 
 执行`docker network ls`,可以看到docker默认新建了3个网络：

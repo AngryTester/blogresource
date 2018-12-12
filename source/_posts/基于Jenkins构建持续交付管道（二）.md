@@ -18,6 +18,7 @@ tags: [Jenkins,Pipeline]
 
 ![](https://raw.githubusercontent.com/AngryTester/blog/master/%E5%9F%BA%E4%BA%8EJenkins%E6%9E%84%E5%BB%BA%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E7%AE%A1%E9%81%93%EF%BC%88%E4%BA%8C%EF%BC%89/4.png)
 
+<!-- more -->
 >部分插件可能需要重启服务才能生效。
 
 

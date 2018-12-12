@@ -2,6 +2,8 @@
 title: Ansible对Windows系统的支持
 date: 2017-02-08 10:11:48
 tags: [Ansible,Windows]
+toc: true
+comment: true
 ---
 
 因为近期有项目考虑用Ansible做Windows机器上的自动投产，因此对Ansible对Windows系统的支持做了一点研究，记录一下。
@@ -16,6 +18,7 @@ tags: [Ansible,Windows]
 
 >最好升级到4.0以上
 >下载地址：http://www.microsoft.com/en-us/download/details.aspx?id=40855
+<!-- more -->
 
 ### 配置Winrm
 

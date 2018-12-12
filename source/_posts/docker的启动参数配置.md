@@ -1,7 +1,7 @@
 ---
 title: docker的启动参数配置
 date: 2018-05-17 08:57:16
-tags: [docker，daemon.json]
+tags: [docker,daemon.json]
 ---
 
 以centos系统为例，启动参数涉及的文件主要为：`/etc/docker/daemon.json`和`/etc/systemd/system/docker.service.d/http-proxy.conf`.
@@ -15,7 +15,7 @@ tags: [docker，daemon.json]
 - "insecure-registries":["http://aad0405c.m.daocloud.io"]-镜像仓库地址，若有多个，可用逗号分割
 
 `http-proxy.conf`为代理设置，参见内容参考如下：
-
+<!-- more -->
 ```
 [Service]
 Environment="HTTP_PROXY=http://172.17.1.1:8080" "HTTPS_PROXY=http://172.17.1.1:8080" "NO_PROXY=172.26.x.x,172.26.x.x"

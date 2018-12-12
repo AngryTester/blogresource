@@ -1,7 +1,7 @@
 ---
 title: docker容器支持中文
 date: 2017-04-06 11:28:26
-tags: [docker，中文]
+tags: [docker,中文]
 ---
 
 ## 问题
@@ -16,3 +16,6 @@ tags: [docker，中文]
 > RUN yum -y install kde-l10n-Chinese && yum -y reinstall glibc-common && localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
 
 > ENV LC_ALL zh_CN.utf8
+
+
+<!-- more -->

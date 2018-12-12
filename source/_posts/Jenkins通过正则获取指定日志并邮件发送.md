@@ -18,6 +18,7 @@ Email-ext plugin插件提供了通过正则解析构建日志，提取指定构�
 
 ${BUILD_LOG_MULTILINE_REGEX,regex="测试数据：.*",maxMatches=0,showTruncatedLines=false,escapeHtml=false,matchedSegmentHtmlStyle="color:blue"}
 
+<!-- more -->
 则可以获取到以“测试数据开头”的内容，并通过邮件发送。
 
 

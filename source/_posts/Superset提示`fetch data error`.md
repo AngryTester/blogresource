@@ -15,7 +15,21 @@ tags: [Superset]
 ## 解决办法
 
 尝试过通过`superset_config.py`启动时注入环境变量无效，因此查看镜像的`Dockerfile`，发现环境变量在其中定义，因此修改重新制作镜像解决，`Dockerfile`内容如下：
-
+<!--more-->
 ```
+FROM amancevice/superset
 
+MAINTAINER Angrytester <thx_phila@yahoo.com>
+
+ENV GUNICORN_TIMEOUT 3600 
+ENV GUNICORN_WORKERS 4
+
+ENV GUNICORN_CMD_ARGS="--workers ${GUNICORN_WORKERS} --timeout ${GUNICORN_TIMEOUT} --bind ${GUNICORN_BIND} --limit-request-line ${GUNICORN_LIMIT_REQUEST_LINE} --limit-request-field_size ${GUNICORN_LIMIT_REQUEST_FIELD_SIZE}"
+
+
+# Deploy application
+EXPOSE 8088
+HEALTHCHECK CMD ["curl", "-f", "http://localhost:8088/health"]
+CMD ["gunicorn", "superset:app"]
+USER superset
 ```
